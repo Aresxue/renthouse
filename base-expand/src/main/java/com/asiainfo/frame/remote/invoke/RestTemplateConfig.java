@@ -1,4 +1,4 @@
-package com.asiainfo.frame.invoke;
+package com.asiainfo.frame.remote.invoke;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;

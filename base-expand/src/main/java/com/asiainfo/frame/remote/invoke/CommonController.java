@@ -1,4 +1,4 @@
-package com.asiainfo.frame.invoke;
+package com.asiainfo.frame.remote.invoke;
 
 
 import com.asiainfo.frame.base.ResponseBase;
