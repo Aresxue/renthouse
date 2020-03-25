@@ -2,14 +2,15 @@ package com.asiainfo.strategy.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * @author: Ares
  * @date: 2019/8/16 17:25
  * @description: Http请求连接池配置
- * 需要在启动类添加扫描目录且Import
  * @version: JDK 1.8
  */
+@Component
 @ConfigurationProperties(prefix = "http.connection.pool")
 public class HttpConnectionPoolConfig
 {
@@ -41,7 +42,7 @@ public class HttpConnectionPoolConfig
     /**
      * 监控线程池的线程数量
      */
-    @Value("${maxRoute:1}")
+    @Value("${monitorThreadNum:1}")
     private int monitorThreadNum;
     /**
      * 空闲超时时间

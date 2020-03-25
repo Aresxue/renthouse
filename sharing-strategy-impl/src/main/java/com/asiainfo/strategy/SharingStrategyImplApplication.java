@@ -6,7 +6,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(scanBasePackages = {"com.asiainfo.frame", "com.asiainfo.strategy"})
+
+/**
+ * @author: Ares
+ * @date: 2020/3/25 15:09
+ * @description: 启动主类
+ * @version: JDK 1.8
+ */
+@SpringBootApplication(scanBasePackages = {
+        "com.asiainfo.frame",
+        "com.asiainfo.strategy.function.impl",
+        "com.asiainfo.strategy.config"})
 @EnableEurekaClient
 @Import(HttpConnectionPoolConfig.class)
 public class SharingStrategyImplApplication

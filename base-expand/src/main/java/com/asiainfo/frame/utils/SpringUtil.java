@@ -3,9 +3,11 @@ package com.asiainfo.frame.utils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.StandardEnvironment;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.support.StandardServletEnvironment;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +26,7 @@ public class SpringUtil implements ApplicationContextAware
     private static ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException
     {
         SpringUtil.applicationContext = applicationContext;
     }
@@ -142,39 +144,68 @@ public class SpringUtil implements ApplicationContextAware
      * @author: Ares
      * @description: 根据前缀获取spring的配置信息(不保留前缀)
      * @date: 2020/3/19 0:15
-     * @param: [prefix] 前缀
+     * @param: [environment, prefix]
+     * 环境信息实体, 前缀
      * @return: java.util.Properties 响应参数
      */
-    public static Properties getPropertiesByPrefix(String prefix)
+    public static Properties getPropertiesByPrefix(Environment environment, String prefix)
     {
-        return getPropertiesByPrefix(prefix, false);
+        return getPropertiesByPrefix(environment, prefix, false);
     }
 
     /**
      * @author: Ares
      * @description: 根据前缀获取spring的配置信息
      * @date: 2020/3/19 0:15
-     * @param: [prefix, retainPrefix]
-     * 前缀, 是否保留前缀
+     * @param: [environment, prefix, retainPrefix]
+     * 环境信息实体, 前缀, 是否保留前缀
      * @return: java.util.Properties 响应参数
      */
-    public static Properties getPropertiesByPrefix(String prefix, boolean retainPrefix)
+    public static Properties getPropertiesByPrefix(Environment environment, String prefix, boolean retainPrefix)
     {
         Properties properties = new Properties();
-        StandardServletEnvironment standardServletEnvironment = (StandardServletEnvironment) applicationContext.getEnvironment();
-        standardServletEnvironment.getPropertySources().forEach(propertySource -> {
+        StandardEnvironment standardEnvironment = (StandardEnvironment) environment;
+        standardEnvironment.getPropertySources().forEach(propertySource -> {
             if (propertySource instanceof MapPropertySource)
             {
                 MapPropertySource mapPropertySource = (MapPropertySource) propertySource;
                 mapPropertySource.getSource().forEach((key, value) -> {
                     if (key.startsWith(prefix))
                     {
-                        properties.put(retainPrefix ? key : key.replace(prefix + ".", ""), value);
+                        String propertyKey = retainPrefix ? key : key.replace(prefix + ".", "");
+                        properties.put(propertyKey, value);
+                        properties.setProperty(propertyKey, String.valueOf(value));
                     }
                 });
             }
         });
         return properties;
+    }
+
+    /**
+     * @author: Ares
+     * @description: 容器启动完成后在运行时根据前缀获取spring的配置信息
+     * @date: 2020/3/19 0:15
+     * @param: [prefix, retainPrefix]
+     * 前缀, 是否保留前缀
+     * @return: java.util.Properties 响应参数
+     */
+    public static Properties getPropertiesByPrefixOnRuntime(String prefix, boolean retainPrefix)
+    {
+        return getPropertiesByPrefix(applicationContext.getEnvironment(), prefix, retainPrefix);
+    }
+
+    /**
+     * @author: Ares
+     * @description: 容器启动完成后在运行时根据前缀获取spring的配置信息(不保留前缀)
+     * @date: 2020/3/19 0:15
+     * @param: [prefix]
+     * 前缀
+     * @return: java.util.Properties 响应参数
+     */
+    public static Properties getPropertiesByPrefixOnRuntime(String prefix)
+    {
+        return getPropertiesByPrefixOnRuntime(prefix, false);
     }
 
 }

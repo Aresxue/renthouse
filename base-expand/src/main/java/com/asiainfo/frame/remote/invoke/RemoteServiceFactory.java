@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @version: JDK 1.8
  */
 @Component
-public class RemoteServiceFactory implements FactoryBean
+public class RemoteServiceFactory implements FactoryBean<Object>
 {
     /**
      * 远程服务接口

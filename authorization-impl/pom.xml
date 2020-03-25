@@ -12,6 +12,11 @@
     <name>authorization-impl</name>
     <description>权限管理实现</description>
 
+    <properties>
+        <!-- <skip>true</skip> -->
+       <skipTests>true</skipTests>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.asiainfo</groupId>

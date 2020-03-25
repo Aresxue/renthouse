@@ -2,7 +2,6 @@ package com.asiainfo.frame.remote.invoke;
 
 import com.asiainfo.frame.annotations.RemoteInfc;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -31,11 +30,10 @@ public class RemoteInvokeHandler
      */
     private static final ClassLoader CLASSLOADER = RemoteInvokeHandler.class.getClassLoader();
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     public <T> T remoteInvoke(final Class<T> remoteInfcClass, String serviceCenter)
     {
-        @SuppressWarnings(value = "unchecked") T result = (T) Proxy.newProxyInstance(CLASSLOADER, new Class<?>[]{remoteInfcClass}, (proxy, method, args) -> {
+        @SuppressWarnings(value = "unchecked")
+        T result = (T) Proxy.newProxyInstance(CLASSLOADER, new Class<?>[]{remoteInfcClass}, (proxy, method, args) -> {
             MultiValueMap<String, Object> remoteRequest = new LinkedMultiValueMap<>();
 
             RemoteInfc remoteInfc = remoteInfcClass.getAnnotation(RemoteInfc.class);

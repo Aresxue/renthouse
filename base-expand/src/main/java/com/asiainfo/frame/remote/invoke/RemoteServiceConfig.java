@@ -38,7 +38,7 @@ public class RemoteServiceConfig
      * @author: Ares
      * @description: 初始化方法
      * @date: 2019/6/1 14:19
-     * @Param: [] 请求参数
+     * @param: [] 请求参数
      * @return: void 响应参数
      */
     @PostConstruct
@@ -75,7 +75,7 @@ public class RemoteServiceConfig
                 field.setAccessible(true);
                 String beanName = Introspector.decapitalize(ClassUtils.getShortName(field.getType().getName()));
 
-                Object object = null;
+                Object object;
                 try
                 {
                     object = applicationContext.getBean(beanName);
@@ -114,9 +114,9 @@ public class RemoteServiceConfig
                         uniqueKey.add(remoteService.version());
                         uniqueKey.add(method.getName());
                         Class<?>[] paramTypes = method.getParameterTypes();
-                        for (int i = 0; i < paramTypes.length; i++)
+                        for (Class<?> paramType : paramTypes)
                         {
-                            uniqueKey.add((paramTypes[i].getName()));
+                            uniqueKey.add((paramType.getName()));
                         }
                         CommonController.addProxyMethod(DigestUtils.md5DigestAsHex(uniqueKey.toString().getBytes(StandardCharsets.UTF_8)), proxyService);
                     }

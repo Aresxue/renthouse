@@ -1,7 +1,8 @@
 package com.asiainfo.strategy.utils;
 
+import com.asiainfo.frame.utils.NameThreadFactory;
+import com.asiainfo.frame.utils.SpringUtil;
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
@@ -31,6 +32,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -39,6 +43,7 @@ import java.io.InterruptedIOException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +59,7 @@ import java.util.concurrent.TimeUnit;
  * 请求由连接池维护
  * @version: JDK 1.8
  */
-public class HttpClientUtil
+public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
 
@@ -84,46 +89,35 @@ public class HttpClientUtil
 
     /**
      * @author: Ares
-     * @description: 配置Http请求对象的消息头和超时时间
-     * @date: 2019/8/16 16:50
+     * @description: 配置http请求对象的消息头
+     * @date: 2019/11/01 16:21
      * @param: [httpRequestBase] 请求基类
      * @return: void
      */
     private static void configRequest(HttpRequestBase httpRequestBase)
     {
-        // 设置Header等
-        // httpRequestBase.setHeader("User-Agent", "Mozilla/5.0");
-        // httpRequestBase
-        // .setHeader("Accept",
-        // "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        // httpRequestBase.setHeader("Accept-Language",
-        // "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");// "en-US,en;q=0.5");
-        // httpRequestBase.setHeader("Accept-Charset",
-        // "ISO-8859-1,utf-8,gbk,gb2312;q=0.7,*;q=0.7");
-
-        // 配置请求的超时设置
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(config.getTimeOut()).setConnectTimeout(config.getTimeOut()).setSocketTimeout(config.getTimeOut()).build();
-        httpRequestBase.setConfig(requestConfig);
+        configRequest(httpRequestBase, Collections.emptyMap(), config.getTimeOut());
     }
 
     /**
      * @author: Ares
-     * @description: 配置Http请求对象的消息头和超时时间
-     * @date: 2019/8/16 16:50
-     * @param: [httpRequestBase] 请求基类
+     * @description: 配置http请求对象的消息头和超时时间
+     * @date: 2019/11/01 16:21
+     * @param: [httpRequestBase, headers, timeOut]
+     * 请求基类, 自定义消息头, 超时时间
      * @return: void
      */
-    private static void configRequest(HttpRequestBase httpRequestBase, int timeOut)
+    private static void configRequest(HttpRequestBase httpRequestBase, Map<String, String> headers, int timeOut)
     {
-        // 设置Header等
+        // 设置公共Header等
         // httpRequestBase.setHeader("User-Agent", "Mozilla/5.0");
-        // httpRequestBase
-        // .setHeader("Accept",
-        // "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        // httpRequestBase.setHeader("Accept-Language",
-        // "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");// "en-US,en;q=0.5");
-        // httpRequestBase.setHeader("Accept-Charset",
-        // "ISO-8859-1,utf-8,gbk,gb2312;q=0.7,*;q=0.7");
+        // httpRequestBase.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        // httpRequestBase.setHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");// "en-US,en;q=0.5");
+        // httpRequestBase.setHeader("Accept-Charset","ISO-8859-1,utf-8,gbk,gb2312;q=0.7,*;q=0.7");
+        httpRequestBase.setHeader("Content-Type", "application/json;charset=utf-8");
+
+        // 根据外部传入参数设置消息头
+        headers.forEach(httpRequestBase::setHeader);
 
         // 配置请求的超时设置
         RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(timeOut).setConnectTimeout(timeOut).setSocketTimeout(timeOut).build();
@@ -266,17 +260,46 @@ public class HttpClientUtil
     /**
      * @author: Ares
      * @description: Post请求URL获取内容
-     * 外部传入超时时间
+     * 支持传入超时时间
+     * 支持传入消息头
      * @date: 2019/5/8 15:38
-     * @param: [url, params, timeOut]
-     * 请求地址, 请求参数, 超时时间
+     * @param: [url, params, headers, timeOut]
+     * 请求地址, 请求参数, 自定义消息头, 超时时间
      * @return: java.lang.String 响应内容
      **/
-    public static String post(String url, Map<String, Object> params, int timeOut) throws Exception
+    public static String post(String url, Map<String, Object> params, Map<String, String> headers, int timeOut) throws Exception
     {
         HttpPost httpPost = new HttpPost(url);
-        configRequest(httpPost, timeOut);
+        configRequest(httpPost, headers, timeOut);
         return request(httpPost, url, params, true);
+    }
+
+    /**
+     * @author: Ares
+     * @description: Post请求URL获取内容
+     * 支持传入消息头
+     * @date: 2019/11/1 16:26
+     * @param: [url, params, headers]
+     * 请求地址, 请求参数, 自定义消息头
+     * @return: java.lang.String 响应参数
+     */
+    public static String post(String url, Map<String, Object> params, Map<String, String> headers) throws Exception
+    {
+        return post(url, params, headers, config.getTimeOut());
+    }
+
+    /**
+     * @author: Ares
+     * @description: Post请求URL获取内容
+     * 支持传入超时时间
+     * @date: 2019/11/1 16:26
+     * @param: [url, params, timeout]
+     * 请求地址, 请求参数, 超时时间
+     * @return: java.lang.String 响应参数
+     */
+    public static String post(String url, Map<String, Object> params, int timeout) throws Exception
+    {
+        return post(url, params, Collections.emptyMap(), timeout);
     }
 
     /**
@@ -289,6 +312,56 @@ public class HttpClientUtil
     public static String get(String url) throws Exception
     {
         HttpGet httpGet = new HttpGet(url);
+        configRequest(httpGet);
+        return request(httpGet, url, null, false);
+    }
+
+    /**
+     * @author: Ares
+     * @description: Get请求URL获取内容
+     * 支持传入消息头
+     * 支持传入超时时间
+     * @date: 2019/11/01 16:30
+     * @param: [url, headers, timeout]
+     * 请求地址, 自定义消息头, 超时时间
+     * @return: java.lang.String 响应内容
+     **/
+    public static String get(String url, Map<String, String> headers, int timeout) throws Exception
+    {
+        HttpGet httpGet = new HttpGet(url);
+        configRequest(httpGet, headers, timeout);
+        return request(httpGet, url, null, false);
+    }
+
+    /**
+     * @author: Ares
+     * @description: Get请求URL获取内容
+     * 支持传入消息头
+     * @date: 2019/11/01 16:30
+     * @param: [url, headers]
+     * 请求地址, 自定义消息头
+     * @return: java.lang.String 响应内容
+     **/
+    public static String get(String url, Map<String, String> headers) throws Exception
+    {
+        HttpGet httpGet = new HttpGet(url);
+        configRequest(httpGet, headers, config.getTimeOut());
+        return request(httpGet, url, null, false);
+    }
+
+    /**
+     * @author: Ares
+     * @description: Get请求URL获取内容
+     * 支持传入超时时间
+     * @date: 2019/11/01 16:30
+     * @param: [url, timeout]
+     * 请求地址, 超时时间
+     * @return: java.lang.String 响应内容
+     **/
+    public static String get(String url, int timeout) throws Exception
+    {
+        HttpGet httpGet = new HttpGet(url);
+        configRequest(httpGet, Collections.emptyMap(), timeout);
         return request(httpGet, url, null, false);
     }
 
@@ -340,9 +413,9 @@ public class HttpClientUtil
     private static void startMonitor()
     {
         // 使用命名的线程工厂, 在排查问题有标识性
-        ThreadFactory monitorHttpConnectPoolFactory = new ThreadFactoryBuilder().setNameFormat(config.getMonitorThreadFactoryName()).build();
+        ThreadFactory monitorHttpConnectPoolFactory = new NameThreadFactory().setNameFormat(config.getMonitorThreadFactoryName()).build();
         monitorExecutor = new ScheduledThreadPoolExecutor(config.getMonitorThreadNum(), monitorHttpConnectPoolFactory);
-        MonitorHttpWorker worker = new MonitorHttpWorker(manager);
+        MonitorHttpWorker worker = new MonitorHttpWorker(manager, config);
         monitorExecutor.scheduleAtFixedRate(worker, config.getHttpMonitorPeriod(), config.getHttpMonitorPeriod(), TimeUnit.MILLISECONDS);
     }
 
@@ -365,14 +438,24 @@ public class HttpClientUtil
             LOGGER.error("关闭连接池时发生异常: ", e);
         }
     }
+
+
+    @Override
+    public void onApplicationEvent(@NonNull ContextRefreshedEvent contextRefreshedEvent)
+    {
+        // 如果自动注入失败那么手动注入
+        if (null == config)
+        {
+            config = (HttpConnectionPoolConfig) SpringUtil.getBean(HttpConnectionPoolConfig.class);
+        }
+    }
 }
 
 class MonitorHttpWorker implements Runnable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MonitorHttpWorker.class);
 
-    @Autowired
-    HttpConnectionPoolConfig config;
+    private HttpConnectionPoolConfig config;
 
     private PoolingHttpClientConnectionManager manager;
 
@@ -381,10 +464,11 @@ class MonitorHttpWorker implements Runnable
      */
     private String threadName;
 
-    MonitorHttpWorker(PoolingHttpClientConnectionManager manager)
+    MonitorHttpWorker(PoolingHttpClientConnectionManager manager, HttpConnectionPoolConfig config)
     {
         super();
         this.manager = manager;
+        this.config = config;
         this.threadName = config.getMonitorThreadName();
     }
 
