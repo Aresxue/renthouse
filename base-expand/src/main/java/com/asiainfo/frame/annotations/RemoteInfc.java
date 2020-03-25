@@ -8,10 +8,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 16:01
- * @Description: 远程服务接口注解
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 16:01
+ * @description: 远程服务接口注解
+ * @version: JDK 1.8
  */
 
 @Inherited

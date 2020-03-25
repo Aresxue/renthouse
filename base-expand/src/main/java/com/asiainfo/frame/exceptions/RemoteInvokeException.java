@@ -3,10 +3,10 @@ package com.asiainfo.frame.exceptions;
 import com.asiainfo.frame.base.ResponseEnum;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/10 19:51
- * @Description: 远程调用自定义异常
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/10 19:51
+ * @description: 远程调用自定义异常
+ * @version: JDK 1.8
  */
 public class RemoteInvokeException extends RuntimeException
 {

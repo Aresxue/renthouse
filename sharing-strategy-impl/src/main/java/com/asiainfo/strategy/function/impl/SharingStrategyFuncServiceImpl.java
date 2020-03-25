@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/17 10:19
- * @Description: 合租攻略实现
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/17 10:19
+ * @description: 合租攻略实现
+ * @version: JDK 1.8
  */
 @RemoteService
 @Service
@@ -22,9 +22,9 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
     private static final Logger logger = LoggerFactory.getLogger(SharingStrategyFuncServiceImpl.class);
 
     /**
-     * @Author: Ares
-     * @Description: 合租攻略
-     * @Date: 2019/6/17 10:20
+     * @author: Ares
+     * @description: 合租攻略
+     * @date: 2019/6/17 10:20
      * @Param: [request] 请求参数
      * @return: ResponseBase 响应参数
      */

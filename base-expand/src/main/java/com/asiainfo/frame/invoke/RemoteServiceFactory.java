@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 17:38
- * @Description: 代理bean的生产工厂
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 17:38
+ * @description: 代理bean的生产工厂
+ * @version: JDK 1.8
  */
 @Component
 public class RemoteServiceFactory implements FactoryBean

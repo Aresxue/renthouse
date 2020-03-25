@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Author: Ares
- * @Date: 2019/5/8 17:11
- * @Description: Class类型处理工具
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/5/8 17:11
+ * @description: Class类型处理工具
+ * @version: JDK 1.8
  */
 public class ClassTypeUtil
 {
@@ -46,9 +46,9 @@ public class ClassTypeUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 判断是否为基础类型
-     * @Date: 2019/5/8 17:48
+     * @author: Ares
+     * @description: 判断是否为基础类型
+     * @date: 2019/5/8 17:48
      * @Param: [className] Class名称
      * @return: boolean 响应参数
      **/
@@ -59,9 +59,9 @@ public class ClassTypeUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 判断是否是基础类型包装类
-     * @Date: 2019/6/14 10:01
+     * @author: Ares
+     * @description: 判断是否是基础类型包装类
+     * @date: 2019/6/14 10:01
      * @Param: [className] Class名称
      * @return: boolean 响应参数
      */
@@ -71,9 +71,9 @@ public class ClassTypeUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 判断是否是基础类型包装类
-     * @Date: 2019/6/14 10:01
+     * @author: Ares
+     * @description: 判断是否是基础类型包装类
+     * @date: 2019/6/14 10:01
      * @Param: [clazz] Class
      * @return: boolean 响应参数
      */
@@ -83,9 +83,9 @@ public class ClassTypeUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 判断是否是基础类型或基础类型包装类
-     * @Date: 2019/6/14 10:07
+     * @author: Ares
+     * @description: 判断是否是基础类型或基础类型包装类
+     * @date: 2019/6/14 10:07
      * @Param: [className] Class名称
      * @return: boolean 响应参数
      */
@@ -95,9 +95,9 @@ public class ClassTypeUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 判断是否是基础类型或基础类型包装类
-     * @Date: 2019/6/14 10:08
+     * @author: Ares
+     * @description: 判断是否是基础类型或基础类型包装类
+     * @date: 2019/6/14 10:08
      * @Param: [clazz] Class
      * @return: boolean 响应参数
      */
@@ -107,9 +107,9 @@ public class ClassTypeUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 判断是否是基础类型或基础类型包装类
-     * @Date: 2019/6/14 10:09
+     * @author: Ares
+     * @description: 判断是否是基础类型或基础类型包装类
+     * @date: 2019/6/14 10:09
      * @Param: [object] 对象
      * @return: boolean 响应参数
      */

@@ -7,17 +7,17 @@ import org.springframework.aop.support.AopUtils;
 import java.lang.reflect.Field;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 15:16
- * @Description: 动态代理工具类
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 15:16
+ * @description: 动态代理工具类
+ * @version: JDK 1.8
  */
 public class DynamicProxyUtil
 {
     /**
-     * @Author: Ares
-     * @Description: 获取目标对象
-     * @Date: 2019/6/1 15:18
+     * @author: Ares
+     * @description: 获取目标对象
+     * @date: 2019/6/1 15:18
      * @Param: [proxy] 请求对象
      * @return: java.lang.Object 真实对象,如不是代理则是其本身
      **/
@@ -42,9 +42,9 @@ public class DynamicProxyUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 获取cglib代理的目标对象
-     * @Date: 2019/6/1 15:19
+     * @author: Ares
+     * @description: 获取cglib代理的目标对象
+     * @date: 2019/6/1 15:19
      * @Param: [proxy] 请求参数
      * @return: java.lang.Object 响应参数
      **/
@@ -61,9 +61,9 @@ public class DynamicProxyUtil
     }
 
     /**
-     * @Author: Ares
-     * @Description: 获取JDK代理的目标对象
-     * @Date: 2019/6/1 15:19
+     * @author: Ares
+     * @description: 获取JDK代理的目标对象
+     * @date: 2019/6/1 15:19
      * @Param: [proxy] 请求参数
      * @return: java.lang.Object 响应参数
      **/

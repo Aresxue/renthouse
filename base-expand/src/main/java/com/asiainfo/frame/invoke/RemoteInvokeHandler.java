@@ -15,10 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/10 17:43
- * @Description: 发起远程调用并封装响应参数
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/10 17:43
+ * @description: 发起远程调用并封装响应参数
+ * @version: JDK 1.8
  */
 @Component
 public class RemoteInvokeHandler

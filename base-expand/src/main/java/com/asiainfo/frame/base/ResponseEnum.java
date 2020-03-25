@@ -1,10 +1,10 @@
 package com.asiainfo.frame.base;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/13 12:05
- * @Description: 响应信息
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/13 12:05
+ * @description: 响应信息
+ * @version: JDK 1.8
  */
 public enum ResponseEnum implements ResponseEnumInfc
 {

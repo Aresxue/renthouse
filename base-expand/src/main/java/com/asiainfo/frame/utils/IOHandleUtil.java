@@ -7,15 +7,22 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * @Author: Ares
- * @Date: 2018/12/24 15:58
- * @Description: IO操作流通用的关闭工具
- * @Version: JDK 1.8
+ * @author Ares
+ * @version JDK 1.8
+ * @date 2018/12/24 15:58
+ * @description: IO操作流通用的操作类
  */
 public class IOHandleUtil
 {
-    private static final Logger logger = LoggerFactory.getLogger(IOHandleUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOHandleUtil.class);
 
+    /**
+     * @author: Ares
+     * @description: 关闭流
+     * @date: 2019/9/29 17:36
+     * @param: [closeable] 请求参数
+     * @return: void 响应参数
+     */
     public static void closeIOSteam(AutoCloseable closeable)
     {
         if (null != closeable)
@@ -25,13 +32,13 @@ public class IOHandleUtil
                 closeable.close();
             } catch (SQLException e)
             {
-                logger.error("关闭sql相关连接或对象时失败: ", e);
+                LOGGER.error("关闭sql相关连接或对象时失败: ", e);
             } catch (IOException e)
             {
-                logger.error("关闭IO操作流时失败: ", e);
+                LOGGER.error("关闭IO操作流时失败: ", e);
             } catch (Exception e)
             {
-                logger.error("IO通用关闭方法调用出错: ", e);
+                LOGGER.error("IO通用关闭方法调用出错: ", e);
             }
         }
     }

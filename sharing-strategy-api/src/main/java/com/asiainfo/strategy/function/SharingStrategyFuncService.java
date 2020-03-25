@@ -6,18 +6,18 @@ import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/13 15:28
- * @Description: 合租攻略接口
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/13 15:28
+ * @description: 合租攻略接口
+ * @version: JDK 1.8
  */
 @RemoteInfc
 public interface SharingStrategyFuncService
 {
     /**
-     * @Author: Ares
-     * @Description: 合租攻略
-     * @Date: 2019/6/17 10:20
+     * @author: Ares
+     * @description: 合租攻略
+     * @date: 2019/6/17 10:20
      * @Param: [request] 请求参数
      * @return: ResponseBase 响应参数
      */

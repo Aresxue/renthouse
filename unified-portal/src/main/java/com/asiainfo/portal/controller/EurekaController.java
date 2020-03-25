@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Author: Ares
- * @Date: 2019/5/31 15:11
- * @Description: Eureka客户端信息获取
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/5/31 15:11
+ * @description: Eureka客户端信息获取
+ * @version: JDK 1.8
  */
 @RestController
 @RequestMapping("/eurekaCenter")
@@ -28,9 +28,9 @@ public class EurekaController
     private DiscoveryClient discoveryClient;
 
     /**
-     * @Author: Ares
-     * @Description: 获取注册在Eureka中的服务名称
-     * @Date: 2019/6/11 14:45
+     * @author: Ares
+     * @description: 获取注册在Eureka中的服务名称
+     * @date: 2019/6/11 14:45
      * @Param: [] 请求参数
      * @return: java.util.List<java.lang.String> 响应参数
      */

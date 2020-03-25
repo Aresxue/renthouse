@@ -1,10 +1,10 @@
 package com.asiainfo.frame.base;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/11 17:39
- * @Description: 响应基类
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/11 17:39
+ * @description: 响应基类
+ * @version: JDK 1.8
  */
 public class ResponseBase
 {

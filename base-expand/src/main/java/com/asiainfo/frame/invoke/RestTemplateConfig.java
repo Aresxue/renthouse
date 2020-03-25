@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/11 16:37
- * @Description: RestTemplate配置类
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/11 16:37
+ * @description: RestTemplate配置类
+ * @version: JDK 1.8
  */
 @Configuration
 public class RestTemplateConfig

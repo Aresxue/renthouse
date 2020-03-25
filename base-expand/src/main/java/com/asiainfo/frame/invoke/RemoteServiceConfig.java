@@ -21,10 +21,10 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 14:18
- * @Description: 远程服务调用扩展配置类
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 14:18
+ * @description: 远程服务调用扩展配置类
+ * @version: JDK 1.8
  */
 @Configuration
 public class RemoteServiceConfig
@@ -35,9 +35,9 @@ public class RemoteServiceConfig
     private ApplicationContext applicationContext;
 
     /**
-     * @Author: Ares
-     * @Description: 初始化方法
-     * @Date: 2019/6/1 14:19
+     * @author: Ares
+     * @description: 初始化方法
+     * @date: 2019/6/1 14:19
      * @Param: [] 请求参数
      * @return: void 响应参数
      */

@@ -3,10 +3,10 @@ package com.asiainfo.frame.invoke;
 import java.lang.reflect.Method;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 16:36
- * @Description: 远程代理服务
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 16:36
+ * @description: 远程代理服务
+ * @version: JDK 1.8
  */
 public class RemoteProxyService
 {

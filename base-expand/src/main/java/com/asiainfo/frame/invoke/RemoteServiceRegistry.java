@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 15:58
- * @Description: 手动生成bean并注册到spring容器
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 15:58
+ * @description: 手动生成bean并注册到spring容器
+ * @version: JDK 1.8
  */
 @Configuration
 public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcessor

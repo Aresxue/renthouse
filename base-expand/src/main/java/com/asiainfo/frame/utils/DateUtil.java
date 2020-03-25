@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.TimeZone;
 
 /**
- * @Author: Ares
- * @Date: 2019/2/25 21:31
- * @Description: 日期工具类
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/2/25 21:31
+ * @description: 日期工具类
+ * @version: JDK 1.8
  */
 public class DateUtil
 {
@@ -25,7 +25,11 @@ public class DateUtil
 
     public static final String T_VALUE = "T";
     public static final String TIME_SUFFIX = "+0000";
-    private static final ThreadLocal<Map<String, SimpleDateFormat>> threadLocal = new ThreadLocal<Map<String, SimpleDateFormat>>()
+
+    /**
+     * 存储格式的Map
+     */
+    private static final ThreadLocal<Map<String, SimpleDateFormat>> DATE_FORMAT_MAP = new ThreadLocal<Map<String, SimpleDateFormat>>()
     {
         @Override
         protected Map<String, SimpleDateFormat> initialValue()
@@ -36,7 +40,7 @@ public class DateUtil
 
     private static SimpleDateFormat getFormat(final String pattern)
     {
-        Map<String, SimpleDateFormat> dateFormatMap = threadLocal.get();
+        Map<String, SimpleDateFormat> dateFormatMap = DATE_FORMAT_MAP.get();
         SimpleDateFormat dateFormat = dateFormatMap.get(pattern);
         if (null == dateFormat)
         {

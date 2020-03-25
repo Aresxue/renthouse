@@ -7,10 +7,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @Author: Ares
- * @Date: 2019/6/1 16:00
- * @Description: 远程服务实现注解
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2019/6/1 16:00
+ * @description: 远程服务实现注解
+ * @version: JDK 1.8
  */
 
 @Target({ElementType.TYPE})

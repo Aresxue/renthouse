@@ -1,5 +1,7 @@
 package com.asiainfo.frame.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -30,15 +32,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Author: Ares
- * @Date: 2018/12/13 18:49
- * @Description: RSA工具类 1.生成公钥私钥文件
- * @Version: JDK 1.8
+ * @author: Ares
+ * @date: 2018/12/13 18:49
+ * @description: RSA工具类 1.生成公钥私钥文件
+ * @version: JDK 1.8
  */
 public class RSAUtils
 {
-    public static final String KEY_ALGORITHM = "RSA";
-    public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+    private static final Logger LOGGER = LoggerFactory.getLogger(RSAUtils.class);
+
+    private static final String KEY_ALGORITHM = "RSA";
+    private static final String SIGNATURE_ALGORITHM = "MD5withRSA";
     private static final String PUBLIC_KEY = "RSAPublicKey";
     private static final String PRIVATE_KEY = "RSAPrivateKey";
     /**
@@ -53,9 +57,9 @@ public class RSAUtils
 
 
     /**
-     * @Author: Ares
-     * @Description: 获取公钥字符串
-     * @Date: 2019/6/13 20:43
+     * @author: Ares
+     * @description: 获取公钥字符串
+     * @date: 2019/6/13 20:43
      * @Param: [keyMap] 请求参数
      * @return: java.lang.String 响应参数
      */
@@ -68,9 +72,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 获得私钥字符串
-     * @Date: 2019/6/13 20:44
+     * @author: Ares
+     * @description: 获得私钥字符串
+     * @date: 2019/6/13 20:44
      * @Param: [keyMap] 请求参数
      * @return: java.lang.String 响应参数
      */
@@ -83,9 +87,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 获取公钥
-     * @Date: 2019/6/13 20:44
+     * @author: Ares
+     * @description: 获取公钥
+     * @date: 2019/6/13 20:44
      * @Param: [key] 请求参数
      * @return: java.security.PublicKey 响应参数
      */
@@ -100,9 +104,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 获取私钥
-     * @Date: 2019/6/13 20:44
+     * @author: Ares
+     * @description: 获取私钥
+     * @date: 2019/6/13 20:44
      * @Param: [key] 请求参数
      * @return: java.security.PrivateKey 响应参数
      */
@@ -117,9 +121,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 解码返回byte
-     * @Date: 2019/6/13 20:44
+     * @author: Ares
+     * @description: 解码返回byte
+     * @date: 2019/6/13 20:44
      * @Param: [key] 请求参数
      * @return: byte[] 响应参数
      */
@@ -130,9 +134,9 @@ public class RSAUtils
 
 
     /**
-     * @Author: Ares
-     * @Description: 编码返回字符串
-     * @Date: 2019/6/13 20:44
+     * @author: Ares
+     * @description: 编码返回字符串
+     * @date: 2019/6/13 20:44
      * @Param: [key] 请求参数
      * @return: java.lang.String 响应参数
      */
@@ -142,9 +146,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 签名
-     * @Date: 2019/6/13 20:45
+     * @author: Ares
+     * @description: 签名
+     * @date: 2019/6/13 20:45
      * @Param: [data, privateKeyStr] 请求参数
      * @return: byte[] 响应参数
      */
@@ -158,9 +162,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 验证
-     * @Date: 2019/6/13 20:45
+     * @author: Ares
+     * @description: 验证
+     * @date: 2019/6/13 20:45
      * @Param: [data, sign, publicKeyStr] 请求参数
      * @return: boolean 响应参数
      */
@@ -174,9 +178,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: RSA加密解密
-     * @Date: 2019/6/13 20:45
+     * @author: Ares
+     * @description: RSA加密解密
+     * @date: 2019/6/13 20:45
      * @Param: [cipher, input] 请求参数
      * @return: byte[] 响应参数
      */
@@ -208,9 +212,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 加密
-     * @Date: 2019/6/13 20:45
+     * @author: Ares
+     * @description: 加密
+     * @date: 2019/6/13 20:45
      * @Param: [plainText, publicKeyStr] 请求参数
      * @return: byte[] 响应参数
      */
@@ -224,9 +228,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 解密
-     * @Date: 2019/6/13 20:45
+     * @author: Ares
+     * @description: 解密
+     * @date: 2019/6/13 20:45
      * @Param: [encryptText, privateKeyStr] 请求参数
      * @return: byte[] 响应参数
      */
@@ -259,9 +263,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 生成公钥和私钥文件
-     * @Date: 2019/6/13 20:45
+     * @author: Ares
+     * @description: 生成公钥和私钥文件
+     * @date: 2019/6/13 20:45
      * @Param: [publicKeyPath, privateKeyPath]
      * 公钥文件路径,私钥文件路径
      * @return: void 响应参数
@@ -295,9 +299,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 根据公钥文件加密
-     * @Date: 2019/6/13 20:46
+     * @author: Ares
+     * @description: 根据公钥文件加密
+     * @date: 2019/6/13 20:46
      * @Param: [input, publicKeyPath] 请求参数
      * @return: byte[] 响应参数
      */
@@ -311,7 +315,7 @@ public class RSAUtils
             StringBuilder publicKey = new StringBuilder();
             File file = new File(publicKeyPath);
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            String tempStr = null;
+            String tempStr;
             while((tempStr = reader.readLine()) != null)
             {
                 publicKey.append(tempStr);
@@ -329,9 +333,9 @@ public class RSAUtils
     }
 
     /**
-     * @Author: Ares
-     * @Description: 利用秘钥文件解密
-     * @Date: 2019/6/13 20:46
+     * @author: Ares
+     * @description: 利用秘钥文件解密
+     * @date: 2019/6/13 20:46
      * @Param: [encryptData, privateKeyPath] 请求参数
      * @return: java.lang.String 响应参数
      */
@@ -341,7 +345,7 @@ public class RSAUtils
         String decryptData = null;
         try
         {
-            StringBuffer privateKey = new StringBuffer();
+            StringBuilder privateKey = new StringBuilder();
             File file = new File(privateKeyPath);
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             String tempStr;
@@ -353,10 +357,10 @@ public class RSAUtils
 
             byte[] plainText = decrypt(encryptData, privateKey.toString());
             decryptData = new String(plainText);
-            System.out.println("解密后明文: " + decryptData);
+            LOGGER.info("解密后明文: {}", decryptData);
         } catch (Exception e)
         {
-            e.printStackTrace();
+            LOGGER.error("解密出错: ", e);
         } finally
         {
             IOHandleUtil.closeIOSteam(reader);
