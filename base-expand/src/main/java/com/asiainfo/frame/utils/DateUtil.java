@@ -44,7 +44,7 @@ public class DateUtil
         SimpleDateFormat dateFormat = dateFormatMap.get(pattern);
         if (null == dateFormat)
         {
-            if (StringUtils.isEmpty(pattern))
+            if (StringUtil.isEmpty(pattern))
             {
                 dateFormat = new SimpleDateFormat("yyyy-MM-dd'" + T_VALUE + "'HH:mm:ss.SSS'" + TIME_SUFFIX + "'");
                 dateFormatMap.put(pattern, dateFormat);

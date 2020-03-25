@@ -1,8 +1,10 @@
 package com.asiainfo.strategy;
 
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
+import com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Import;
 
@@ -13,12 +15,9 @@ import org.springframework.context.annotation.Import;
  * @description: 启动主类
  * @version: JDK 1.8
  */
-@SpringBootApplication(scanBasePackages = {
-        "com.asiainfo.frame",
-        "com.asiainfo.strategy.function.impl",
-        "com.asiainfo.strategy.config"})
+@SpringBootApplication(scanBasePackages = {"com.asiainfo.frame", "com.asiainfo.strategy.function.impl", "com.asiainfo.strategy.config", "com.asiainfo.strategy.multiple.datasources"}, exclude = DataSourceAutoConfiguration.class)
 @EnableEurekaClient
-@Import(HttpConnectionPoolConfig.class)
+@Import({HttpConnectionPoolConfig.class, DynamicDataSourceConfiguration.class})
 public class SharingStrategyImplApplication
 {
 

@@ -13,11 +13,12 @@
     <description>合租攻略实现</description>
 
     <properties>
-       <!-- <skip>true</skip> -->
+        <!-- <skip>true</skip> -->
         <skipTests>true</skipTests>
-        <!-- http连接版本 -->
         <httpclient.version>4.5.12</httpclient.version>
-        <!-- http连接版本 -->
+        <druid.version>1.1.21</druid.version>
+        <mysql.version>8.0.19</mysql.version>
+        <mybatis.version>2.1.2</mybatis.version>
     </properties>
 
     <dependencies>
@@ -32,6 +33,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- http连接 -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -40,6 +46,29 @@
         </dependency>
         <!-- http连接 -->
 
+        <!-- Druid数据库连接池 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+        <!-- Druid数据库连接池 -->
+
+        <!-- MYSQL 依赖 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <!-- MYSQL 依赖 -->
+
+        <!-- Mybatis 依赖 -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis.version}</version>
+        </dependency>
+        <!-- Mybatis 依赖 -->
     </dependencies>
 
     <build>

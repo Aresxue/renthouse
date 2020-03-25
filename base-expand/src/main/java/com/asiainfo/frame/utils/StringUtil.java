@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * @author Ares
  * @date 2018/6/1 10:44
  */
-public class StringUtils
+public class StringUtil
 {
     public static boolean isNotEmpty(String s)
     {
@@ -116,7 +116,7 @@ public class StringUtils
      */
     public static boolean validateEmailFromat(String email)
     {
-        if (StringUtils.isEmpty(email))
+        if (StringUtil.isEmpty(email))
         {
             return false;
         }
