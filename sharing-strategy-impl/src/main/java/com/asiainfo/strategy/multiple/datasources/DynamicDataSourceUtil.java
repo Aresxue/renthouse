@@ -3,6 +3,8 @@ package com.asiainfo.strategy.multiple.datasources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DEFAULT_TARGET_DATASOURCE;
+
 /**
  * @author: Ares
  * @date: 2020/3/19 11:39
@@ -55,6 +57,7 @@ public class DynamicDataSourceUtil
         if (!DynamicDataSourceContextHolder.containsDataSource(dataSourceId))
         {
             LOGGER.error("数据源: {}不存在，方法: {}使用默认数据源", dataSourceId, methodName);
+            DynamicDataSourceContextHolder.setDataSourceId(DEFAULT_TARGET_DATASOURCE);
         }
         else
         {
