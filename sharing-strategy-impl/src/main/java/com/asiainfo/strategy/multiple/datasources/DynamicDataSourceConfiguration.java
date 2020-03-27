@@ -58,7 +58,7 @@ public class DynamicDataSourceConfiguration
      * @param: [] 请求参数
      * @return: com.asiainfo.account.multiple.data.sources.DynamicDataSource 响应参数
      */
-    @Bean
+    @Bean(name = "dynamicDataSource")
     @Primary
     public DynamicDataSource initDynamicDataSource()
     {

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
  * @description: 启动主类
  * @version: JDK 1.8
  */
-@SpringBootApplication(scanBasePackages = {"com.asiainfo.frame", "com.asiainfo.strategy.function.impl", "com.asiainfo.strategy.config", "com.asiainfo.strategy.multiple.datasources"}, exclude = DataSourceAutoConfiguration.class)
+@SpringBootApplication(scanBasePackages = {"com.asiainfo.frame", "com.asiainfo.strategy.function.impl", "com.asiainfo.strategy.business.impl", "com.asiainfo.strategy.config", "com.asiainfo.strategy.multiple.datasources", "com.asiainfo.strategy.mapper"}, exclude = DataSourceAutoConfiguration.class)
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class, DynamicDataSourceConfiguration.class})
 public class SharingStrategyImplApplication
