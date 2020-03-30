@@ -56,12 +56,13 @@ public class DynamicDataSourceUtil
      */
     public static void changeDataSource(String dataSourceId, String methodName)
     {
-        // 第一次初始化的时候数据源改变标识不处理
+        // 第一次初始化的时候数据源改变标识不做处理
         if (null != DynamicDataSourceUtil.getDataSourceId())
         {
             // 设置数据源是否改变
             setDatasourceChange(!dataSourceId.equals(DynamicDataSourceUtil.getDataSourceId()));
         }
+        // 初始化和数据源切换时执行处理
         if (null == getDatasourceChange() || getDatasourceChange())
         {
             if (!DynamicDataSourceUtil.containsDataSource(dataSourceId))

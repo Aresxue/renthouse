@@ -24,5 +24,13 @@ public class DynamicDataSourceConstans
      * 类名和方法名的连接符
      */
     public static final String CLASS_AND_METHOD_CONNECTOR = "#";
+    /**
+     * 事务启动标识
+     */
+    public static final String DYNAMIC_TRANSACTION_MANAGER_EXIST = "dynamicTransactionManagerExist";
+    /**
+     * 事务只读标识
+     */
+    public static final String DYNAMIC_TRANSACTION_MANAGER_ROLLBACKONLY = "dynamicTransactionManagerRollbackOnly";
 
 }
