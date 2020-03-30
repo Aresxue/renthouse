@@ -10,8 +10,6 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.mybatis.spring.transaction.SpringManagedTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
@@ -29,9 +27,6 @@ import java.util.Properties;
 @Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}), @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
 public class DynamicSourceInterceptor implements Interceptor
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicSourceInterceptor.class);
-
-
     /**
      * @author: Ares
      * @description: 强行把链接置空, 然后重新获取

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.lang.NonNull;
@@ -24,20 +23,17 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_EXIST;
-import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_ROLLBACKONLY;
-
 /**
  * @author: Ares
  * @date: 2020/3/27 15:16
  * @description: 动态数据源自定义事务管理器
  * 必须搭配TargetDataSource注解使用
- * 该事务管理器目前只支持PROPAGATION_REQUIRED传播级别
- * 不建议使用, 没有处理好commit情形
+ * 该事务管理器只支持PROPAGATION_REQUIRED传播级别
+ * 不建议使用
  * @version: JDK 1.8
  */
 @Deprecated
-@Configuration(value = "dynamicDataSourceTransactionManagerDemo")
+//@Configuration(value = "dynamicDataSourceTransactionManagerDemo")
 public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTransactionManager implements ResourceTransactionManager, InitializingBean
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceTransactionManagerDemo.class);
@@ -51,8 +47,8 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
      */
     private static final ThreadLocal<Map<String, Boolean>> DYNAMIC_DATASOURCE_TRANSACTION_MANAGER = ThreadLocal.withInitial(() -> {
         Map<String, Boolean> dynamicTransactionMap = new HashMap<>(2);
-        dynamicTransactionMap.put(DYNAMIC_TRANSACTION_MANAGER_EXIST, Boolean.FALSE);
-        dynamicTransactionMap.put(DYNAMIC_TRANSACTION_MANAGER_ROLLBACKONLY, Boolean.FALSE);
+        dynamicTransactionMap.put("dynamicTransactionManagerExist", Boolean.FALSE);
+        dynamicTransactionMap.put("dynamicTransactionManagerRollbackOnly", Boolean.FALSE);
         return dynamicTransactionMap;
     });
 
@@ -86,7 +82,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
     @Override
     protected boolean isExistingTransaction(Object transaction)
     {
-        return DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().getOrDefault(DYNAMIC_TRANSACTION_MANAGER_EXIST, false);
+        return DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().getOrDefault("dynamicTransactionManagerExist", false);
     }
 
     /**
@@ -100,7 +96,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
     protected void doSetRollbackOnly(DefaultTransactionStatus status)
     {
         // 标记事务管理器在线程内已准备要回滚
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put(DYNAMIC_TRANSACTION_MANAGER_ROLLBACKONLY, Boolean.TRUE);
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put("dynamicTransactionManagerRollbackOnly", Boolean.TRUE);
     }
 
     @Override
@@ -108,6 +104,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
     {
         LOGGER.info("动态数据源自定义分布式事务开始, 当前线程 :{}", Thread.currentThread().getId());
 
+        // 默认数据源链接排在最后
         Map<String, Connection> connectionMap = (Map<String, Connection>) transaction;
 
         // 遍历系统中的所有数据源, 打开链接
@@ -122,7 +119,6 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
                     connection.setAutoCommit(false);
                     // 缓存链接
                     TransactionSynchronizationManager.bindResource(datasource, new ConnectionHolder(connection));
-                    // 为当前事务使用数据源缓存链接
                     if (DynamicDataSourceUtil.getDataSourceId().equals(datasourceId))
                     {
                         TransactionSynchronizationManager.bindResource(dynamicDataSource, new ConnectionHolder(connection));
@@ -144,7 +140,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
 
 
         // 标记事务管理器已经在线程内启动
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put(DYNAMIC_TRANSACTION_MANAGER_EXIST, Boolean.TRUE);
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put("dynamicTransactionManagerExist", Boolean.TRUE);
     }
 
 
@@ -219,22 +215,22 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
     protected void doCleanupAfterCompletion(Object transaction)
     {
         Map<String, Connection> connectionMap = (Map<String, Connection>) transaction;
-        // 关闭数据源链接
+        // 关闭额外数据源链接
         connectionMap.forEach((datasourceId, connection) -> {
             DataSource dataSource = DynamicDataSourceUtil.getDataSource(datasourceId);
             TransactionSynchronizationManager.unbindResource(dataSource);
             DataSourceUtils.releaseConnection(connection, dataSource);
-            LOGGER.debug("数据源: {}关闭链接成功", datasourceId);
+            LOGGER.debug("额外数据源: {}关闭链接成功", datasourceId);
         });
 
-        // 释放动态数据源资源
+        // 释放本地资源
         if (TransactionSynchronizationManager.hasResource(dynamicDataSource))
         {
             TransactionSynchronizationManager.unbindResource(dynamicDataSource);
         }
 
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove(DYNAMIC_TRANSACTION_MANAGER_EXIST);
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove(DYNAMIC_TRANSACTION_MANAGER_ROLLBACKONLY);
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove("dynamicTransactionManagerExist");
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove("dynamicTransactionManagerRollbackOnly");
         DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.remove();
 
         LOGGER.info("动态数据源自定义分布式事务释放, 当前线程: {}", Thread.currentThread().getId());
