@@ -154,7 +154,8 @@ public class TestServiceImpl implements TestService
      * @return: int 响应参数
      */
     @Override
-    @Transactional(transactionManager = "ddstm")
+    @Transactional(transactionManager = "dynamicDataSourceTransactionManager")
+    @TargetDataSource
     public void testInsertPayment()
     {
         for (int i = 0; i < 100; i++)
@@ -162,21 +163,21 @@ public class TestServiceImpl implements TestService
             testMapper.testInsertPayment(i);
         }
 
-        DynamicDataSourceUtil.changeDataSource("datasourceOne");
-        for (int i = 0; i < 100; i++)
-        {
-            testMapper.testInsertPayment(i);
-        }
+        //        DynamicDataSourceUtil.changeDataSource("datasourceOne");
+        //        for (int i = 0; i < 100; i++)
+        //        {
+        //            testMapper.testInsertPayment(i);
+        //        }
 
 
-        //                testProvider.testInsertPayment();
-        //                try
-        //                {
-        //                    testProvider.testInsertPayment();
-        //                } catch (Exception e)
-        //                {
-        //                    e.printStackTrace();
-        //                }
+        testProvider.testInsertPayment();
+        //        try
+        //        {
+        //            testProvider.testInsertPayment();
+        //        } catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //        }
     }
 
     //    @Transactional

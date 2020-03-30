@@ -18,6 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.CUSTOM_DATASOURCE_DELIMITER;
+import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.CUSTOM_DATASOURCE_PREFIX;
+import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DEFAULT_TARGET_DATASOURCE;
+
 /**
  * @author: Ares
  * @date: 2020/3/19 12:16
@@ -65,21 +69,23 @@ public class DynamicDataSourceConfiguration
         DataSource defaultTargetDataSource = initDefaultTargetDataSource();
         Map<Object, Object> targetDataSources = new HashMap<>(8);
         // 添加默认数据源
-        targetDataSources.put(DynamicDataSourceConstans.DEFAULT_TARGET_DATASOURCE, defaultTargetDataSource);
-        DynamicDataSourceContextHolder.dataSourceIds.add(DynamicDataSourceConstans.DEFAULT_TARGET_DATASOURCE);
+        targetDataSources.put(DEFAULT_TARGET_DATASOURCE, defaultTargetDataSource);
+
         // 添加自定义数据源
         if (StringUtil.isNotEmpty(customDatasourceIds))
         {
-            Arrays.stream(customDatasourceIds.split(DynamicDataSourceConstans.CUSTOM_DATASOURCE_DELIMITER)).forEach(datasourceId -> {
-                Properties properties = SpringUtil.getPropertiesByPrefix(environment, DynamicDataSourceConstans.CUSTOM_DATASOURCE_PREFIX + datasourceId);
+            Arrays.stream(customDatasourceIds.split(CUSTOM_DATASOURCE_DELIMITER)).forEach(datasourceId -> {
+                Properties properties = SpringUtil.getPropertiesByPrefix(environment, CUSTOM_DATASOURCE_PREFIX + datasourceId);
                 // 将属性的key中的中划线-转为小驼峰式, 如druid.test-while-idle转为如druid.testWhileIdle
                 properties.stringPropertyNames().forEach(propertyNames -> properties.setProperty(StringUtil.strikeToLittleCamelCase(propertyNames), properties.getProperty(propertyNames)));
                 DruidDataSource druidDataSource = new DruidDataSource();
                 druidDataSource.configFromPropety(properties);
                 targetDataSources.put(datasourceId, druidDataSource);
-                DynamicDataSourceContextHolder.dataSourceIds.add(datasourceId);
+                DynamicDataSourceUtil.addDataSource(datasourceId, druidDataSource);
             });
         }
+        // 此时添加保证默认数据源排在最后
+        DynamicDataSourceUtil.addDataSource(DEFAULT_TARGET_DATASOURCE, defaultTargetDataSource);
         return new DynamicDataSource(defaultTargetDataSource, targetDataSources);
     }
 }
