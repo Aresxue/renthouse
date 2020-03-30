@@ -29,12 +29,15 @@ import java.util.Map;
  * @date: 2020/3/27 15:16
  * @description: 动态数据源自定义事务管理器
  * 必须搭配TargetDataSource注解使用
+ * 该事务管理器只支持PROPAGATION_REQUIRED传播级别
+ * 不建议使用
  * @version: JDK 1.8
  */
-@Configuration(value = "dynamicDataSourceTransactionManager")
-public class DynamicDataSourceTransactionManager extends AbstractPlatformTransactionManager implements ResourceTransactionManager, InitializingBean
+@Deprecated
+@Configuration(value = "dynamicDataSourceTransactionManagerDemo")
+public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTransactionManager implements ResourceTransactionManager, InitializingBean
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceTransactionManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceTransactionManagerDemo.class);
 
     @Autowired
     @Qualifier(value = "dynamicDataSource")
@@ -105,7 +108,7 @@ public class DynamicDataSourceTransactionManager extends AbstractPlatformTransac
         // 默认数据源链接排在最后
         Map<String, Connection> connectionMap = (Map<String, Connection>) transaction;
 
-        // 遍历系统中的所有额外数据源, 打开链接
+        // 遍历系统中的所有数据源, 打开链接
         DynamicDataSourceUtil.getDataSourceMap().forEach((datasourceId, datasource) -> {
             Connection connection;
             try
@@ -117,16 +120,14 @@ public class DynamicDataSourceTransactionManager extends AbstractPlatformTransac
                     connection.setAutoCommit(false);
                     // 缓存链接
                     TransactionSynchronizationManager.bindResource(datasource, new ConnectionHolder(connection));
+                    if (DynamicDataSourceUtil.getDataSourceId().equals(datasourceId))
+                    {
+                        TransactionSynchronizationManager.bindResource(dynamicDataSource, new ConnectionHolder(connection));
+                    }
                 }
                 else
                 {
                     connection = conHolder.getConnection();
-                }
-
-                // 系统数据源放进资源里
-                if (DynamicDataSourceUtil.getDataSourceId().equals(datasourceId))
-                {
-                    TransactionSynchronizationManager.bindResource(dynamicDataSource, new ConnectionHolder(connection));
                 }
 
                 connectionMap.put(datasourceId, connection);
@@ -224,7 +225,10 @@ public class DynamicDataSourceTransactionManager extends AbstractPlatformTransac
         });
 
         // 释放本地资源
-        TransactionSynchronizationManager.unbindResource(dynamicDataSource);
+        if (TransactionSynchronizationManager.hasResource(dynamicDataSource))
+        {
+            TransactionSynchronizationManager.unbindResource(dynamicDataSource);
+        }
 
         DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove("dynamicTransactionManagerExist");
         DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove("dynamicTransactionManagerRollbackOnly");

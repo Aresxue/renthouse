@@ -2,6 +2,11 @@ package com.asiainfo.strategy.multiple.datasources;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.datasource.ConnectionHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.sql.DataSource;
 import java.util.LinkedHashMap;
@@ -15,9 +20,14 @@ import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConsta
  * @description: 动态数据工具类
  * @version: JDK 1.8
  */
+@Component
 public class DynamicDataSourceUtil
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceUtil.class);
+
+    @Autowired
+    @Qualifier(value = "dynamicDataSource")
+    private static DynamicDataSource dynamicDataSource;
 
     /**
      * @author: Ares
@@ -46,16 +56,30 @@ public class DynamicDataSourceUtil
      */
     public static void changeDataSource(String dataSourceId, String methodName)
     {
-        if (!DynamicDataSourceUtil.containsDataSource(dataSourceId))
+
+        boolean isChanged = !dataSourceId.equals(DynamicDataSourceUtil.getDataSourceId());
+        if (isChanged)
         {
-            LOGGER.error("数据源: {}不存在，方法: {}使用默认数据源", dataSourceId, methodName);
-            DynamicDataSourceUtil.setDataSourceId(DEFAULT_TARGET_DATASOURCE);
+            if (!DynamicDataSourceUtil.containsDataSource(dataSourceId))
+            {
+                LOGGER.error("数据源: {}不存在，方法: {}使用默认数据源", dataSourceId, methodName);
+                DynamicDataSourceUtil.setDataSourceId(DEFAULT_TARGET_DATASOURCE);
+            }
+            else
+            {
+                LOGGER.debug("方法: {}切换至指定数据库: {}", methodName, dataSourceId);
+                DynamicDataSourceUtil.setDataSourceId(dataSourceId);
+            }
+
+            ConnectionHolder connectionHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(DynamicDataSourceUtil.getDataSource(dataSourceId));
+            if (null != connectionHolder)
+            {
+                TransactionSynchronizationManager.unbindResource(dynamicDataSource);
+                TransactionSynchronizationManager.bindResource(dynamicDataSource, connectionHolder);
+            }
         }
-        else
-        {
-            LOGGER.debug("方法: {}切换至指定数据库: {}", methodName, dataSourceId);
-            DynamicDataSourceUtil.setDataSourceId(dataSourceId);
-        }
+
+
     }
 
 
@@ -161,4 +185,11 @@ public class DynamicDataSourceUtil
          */
         private static final Map<String, DataSource> DATASOURCE_MAP = new LinkedHashMap<>(8);
     }
+
+    @Autowired
+    public void setDynamicDataSource(DynamicDataSource dynamicDataSource)
+    {
+        DynamicDataSourceUtil.dynamicDataSource = dynamicDataSource;
+    }
+
 }
