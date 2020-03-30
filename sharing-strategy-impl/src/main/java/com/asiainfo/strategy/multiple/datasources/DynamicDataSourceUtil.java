@@ -56,9 +56,13 @@ public class DynamicDataSourceUtil
      */
     public static void changeDataSource(String dataSourceId, String methodName)
     {
-
-        boolean isChanged = !dataSourceId.equals(DynamicDataSourceUtil.getDataSourceId());
-        if (isChanged)
+        // 第一次初始化的时候数据源改变标识不处理
+        if (null != DynamicDataSourceUtil.getDataSourceId())
+        {
+            // 设置数据源是否改变
+            setDatasourceChange(!dataSourceId.equals(DynamicDataSourceUtil.getDataSourceId()));
+        }
+        if (null == getDatasourceChange() || getDatasourceChange())
         {
             if (!DynamicDataSourceUtil.containsDataSource(dataSourceId))
             {
@@ -78,7 +82,6 @@ public class DynamicDataSourceUtil
                 TransactionSynchronizationManager.bindResource(dynamicDataSource, connectionHolder);
             }
         }
-
 
     }
 
@@ -170,6 +173,30 @@ public class DynamicDataSourceUtil
 
     /**
      * @author: Ares
+     * @description: 设置数据源改变标识
+     * @date: 2020/3/30 17:37
+     * @param: [value] 请求参数
+     * @return: void 响应参数
+     */
+    public static void setDatasourceChange(Boolean value)
+    {
+        DynamicDataSourceContextHolder.datasourceChanged.set(value);
+    }
+
+    /**
+     * @author: Ares
+     * @description: 获取数据源改变标识
+     * @date: 2020/3/30 17:37
+     * @param: [] 请求参数
+     * @return: boolean 数据源改变标识
+     */
+    public static Boolean getDatasourceChange()
+    {
+        return DynamicDataSourceContextHolder.datasourceChanged.get();
+    }
+
+    /**
+     * @author: Ares
      * @date: 2020/3/19 11:40
      * @description: 动态数据源线程安全类
      * @version: JDK 1.8
@@ -184,6 +211,10 @@ public class DynamicDataSourceUtil
          * 额外数据源集合, 可用于遍历数据源, 执行数据源获取和判断操作
          */
         private static final Map<String, DataSource> DATASOURCE_MAP = new LinkedHashMap<>(8);
+        /**
+         * 数据源改变标识
+         */
+        private static volatile ThreadLocal<Boolean> datasourceChanged = new ThreadLocal<>();
     }
 
     @Autowired

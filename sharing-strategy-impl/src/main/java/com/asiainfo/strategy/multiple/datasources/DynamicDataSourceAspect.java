@@ -32,7 +32,7 @@ public class DynamicDataSourceAspect
 
     /**
      * @author: Ares
-     * @description: 根据注解配置设置数据源, 方法共分为以下情况
+     * @description: 根据注解配置设置数据源, 没有事务时方法共分为以下情况
      * 1.没有TargetDataSource注解, 使用默认数据源
      * 2.有TargetDataSource注解且不指定数据源, 使用默认数据源
      * 3.有TargetDataSource注解且指定存在的数据源, 使用指定数据源(可能是默认数据源)
