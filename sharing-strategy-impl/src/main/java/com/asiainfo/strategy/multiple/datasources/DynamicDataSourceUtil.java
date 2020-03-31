@@ -2,11 +2,7 @@ package com.asiainfo.strategy.multiple.datasources;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.sql.DataSource;
 import java.util.LinkedHashMap;
@@ -24,10 +20,6 @@ import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConsta
 public class DynamicDataSourceUtil
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceUtil.class);
-
-    @Autowired
-    @Qualifier(value = "dynamicDataSource")
-    private static DynamicDataSource dynamicDataSource;
 
     /**
      * @author: Ares
@@ -74,13 +66,6 @@ public class DynamicDataSourceUtil
             {
                 LOGGER.debug("方法: {}切换至指定数据库: {}", methodName, dataSourceId);
                 DynamicDataSourceUtil.setDataSourceId(dataSourceId);
-            }
-
-            ConnectionHolder connectionHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(DynamicDataSourceUtil.getDataSource(dataSourceId));
-            if (null != connectionHolder)
-            {
-                TransactionSynchronizationManager.unbindResource(dynamicDataSource);
-                TransactionSynchronizationManager.bindResource(dynamicDataSource, connectionHolder);
             }
         }
 
@@ -216,12 +201,6 @@ public class DynamicDataSourceUtil
          * 数据源改变标识
          */
         private static volatile ThreadLocal<Boolean> datasourceChanged = new ThreadLocal<>();
-    }
-
-    @Autowired
-    public void setDynamicDataSource(DynamicDataSource dynamicDataSource)
-    {
-        DynamicDataSourceUtil.dynamicDataSource = dynamicDataSource;
     }
 
 }
