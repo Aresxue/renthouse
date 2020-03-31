@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.lang.NonNull;
@@ -23,6 +24,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_EXIST;
+import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_ROLLBACK_ONLY;
+
 /**
  * @author: Ares
  * @date: 2020/3/27 15:16
@@ -33,7 +37,7 @@ import java.util.Map;
  * @version: JDK 1.8
  */
 @Deprecated
-//@Configuration(value = "dynamicDataSourceTransactionManagerDemo")
+@Configuration(value = "dynamicDataSourceTransactionManagerDemo")
 public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTransactionManager implements ResourceTransactionManager, InitializingBean
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceTransactionManagerDemo.class);
@@ -47,8 +51,8 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
      */
     private static final ThreadLocal<Map<String, Boolean>> DYNAMIC_DATASOURCE_TRANSACTION_MANAGER = ThreadLocal.withInitial(() -> {
         Map<String, Boolean> dynamicTransactionMap = new HashMap<>(2);
-        dynamicTransactionMap.put("dynamicTransactionManagerExist", Boolean.FALSE);
-        dynamicTransactionMap.put("dynamicTransactionManagerRollbackOnly", Boolean.FALSE);
+        dynamicTransactionMap.put(DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_EXIST, Boolean.FALSE);
+        dynamicTransactionMap.put(DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_ROLLBACK_ONLY, Boolean.FALSE);
         return dynamicTransactionMap;
     });
 
@@ -82,7 +86,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
     @Override
     protected boolean isExistingTransaction(Object transaction)
     {
-        return DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().getOrDefault("dynamicTransactionManagerExist", false);
+        return DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().getOrDefault(DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_EXIST, false);
     }
 
     /**
@@ -96,7 +100,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
     protected void doSetRollbackOnly(DefaultTransactionStatus status)
     {
         // 标记事务管理器在线程内已准备要回滚
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put("dynamicTransactionManagerRollbackOnly", Boolean.TRUE);
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put(DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_ROLLBACK_ONLY, Boolean.TRUE);
     }
 
     @Override
@@ -140,7 +144,7 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
 
 
         // 标记事务管理器已经在线程内启动
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put("dynamicTransactionManagerExist", Boolean.TRUE);
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().put(DynamicDataSourceConstans.DYNAMIC_TRANSACTION_MANAGER_EXIST, Boolean.TRUE);
     }
 
 
@@ -229,8 +233,8 @@ public class DynamicDataSourceTransactionManagerDemo extends AbstractPlatformTra
             TransactionSynchronizationManager.unbindResource(dynamicDataSource);
         }
 
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove("dynamicTransactionManagerExist");
-        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove("dynamicTransactionManagerRollbackOnly");
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove(DYNAMIC_TRANSACTION_MANAGER_EXIST);
+        DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.get().remove(DYNAMIC_TRANSACTION_MANAGER_ROLLBACK_ONLY);
         DYNAMIC_DATASOURCE_TRANSACTION_MANAGER.remove();
 
         LOGGER.info("动态数据源自定义分布式事务释放, 当前线程: {}", Thread.currentThread().getId());

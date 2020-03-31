@@ -31,6 +31,6 @@ public class DynamicDataSourceConstans
     /**
      * 事务只读标识
      */
-    public static final String DYNAMIC_TRANSACTION_MANAGER_ROLLBACKONLY = "dynamicTransactionManagerRollbackOnly";
+    public static final String DYNAMIC_TRANSACTION_MANAGER_ROLLBACK_ONLY = "dynamicTransactionManagerRollbackOnly";
 
 }
