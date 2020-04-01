@@ -171,13 +171,15 @@ public class TestServiceImpl implements TestService
 
 
         testProvider.testInsertPayment();
-        //        try
-        //        {
-        //            testProvider.testInsertPayment();
-        //        } catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //        }
+//        throw new RuntimeException();
+
+//                try
+//                {
+//                    testProvider.testInsertPayment();
+//                } catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
     }
 
     //    @Transactional
