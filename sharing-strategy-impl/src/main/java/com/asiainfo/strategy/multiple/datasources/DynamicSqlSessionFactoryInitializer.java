@@ -21,9 +21,9 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @description: 动态数据源自定义SqlSessionFactory
  * @version: JDK 1.8
  */
-public class DynamicSqlSessionFactoryConfiguration implements ApplicationContextInitializer
+public class DynamicSqlSessionFactoryInitializer implements ApplicationContextInitializer
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicSqlSessionFactoryConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicSqlSessionFactoryInitializer.class);
 
     @Override
     public void initialize(ConfigurableApplicationContext configurableApplicationContext)

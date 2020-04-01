@@ -2,7 +2,6 @@ package com.asiainfo.strategy;
 
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
 import com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConfiguration;
-import com.asiainfo.strategy.multiple.datasources.DynamicSqlSessionFactoryConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -31,9 +30,7 @@ public class SharingStrategyImplApplication
 
     public static void main(String[] args)
     {
-        SpringApplication application = new SpringApplication(SharingStrategyImplApplication.class);
-        application.addInitializers(new DynamicSqlSessionFactoryConfiguration());
-        application.run(args);
+        SpringApplication.run(SharingStrategyImplApplication.class, args);
     }
 
 }
