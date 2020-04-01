@@ -45,6 +45,6 @@ public class TestProviderImpl implements TestProvider
         {
             testMapper.testInsertPayment(i);
         }
-        throw new RuntimeException();
+//        throw new RuntimeException();
     }
 }
