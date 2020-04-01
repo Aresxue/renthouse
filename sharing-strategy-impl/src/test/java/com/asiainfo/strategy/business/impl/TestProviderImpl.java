@@ -37,7 +37,7 @@ public class TestProviderImpl implements TestProvider
 
 
     @Override
-    @Transactional(transactionManager = "dynamicDataSourceTransactionManagerDemo")
+    @Transactional
     @TargetDataSource(dataSourceId = "datasourceOne")
     public void testInsertPayment()
     {
