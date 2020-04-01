@@ -32,7 +32,8 @@ import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConsta
  * @date: 2020/3/27 15:16
  * @description: 动态数据源自定义事务管理器
  * 必须搭配TargetDataSource注解使用
- * 该事务管理器只支持PROPAGATION_REQUIRED传播级别
+ * 该事务管理器只支持PROPAGATION_REQUIRED传播级别,
+ * 此时只要出问题所有数据库全部都会回滚, 切记不能把异常吞掉(try-catch)不然事务依旧会提交
  * 不建议使用
  * @version: JDK 1.8
  */

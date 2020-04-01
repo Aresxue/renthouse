@@ -1,6 +1,5 @@
 package com.asiainfo.strategy.mapper;
 
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -33,7 +32,6 @@ public interface TestMapper
      * @param: [value] 请求参数
      * @return: int 响应参数
      */
-    @Insert("INSERT INTO payment_202003 (payment_id, operated_payment_serial_nbr, acct_id, prod_inst_id, acc_num,\n" + "                            operation_type, amount, deposit_amount, payment_method, payment_channel_id, staff_id,\n" + "                            org_id, payment_date, inv_offer, region_id, pay_cycle_id, business_rec_id,\n" + "                            status_cd, status_date, create_date, route_id)\n" + "VALUES\n" + "       (#{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, now(), #{value}, #{value}, #{value}, #{value}, #{value}, now(), now(), #{value})")
     int testInsertPayment(@Param("value") int value);
 
 }
