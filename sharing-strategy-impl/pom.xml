@@ -76,34 +76,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <!-- 加入该配置，使用maven package，依赖jar不会打包在项目最终jar文件内 -->
-                        <groupId>org.springframework.boot.experimental</groupId>
-                        <artifactId>spring-boot-thin-layout</artifactId>
-                        <version>1.0.23.RELEASE</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <!-- 加入该配置，maven package执行时会在target目录整理好依赖包 -->
-            <!-- 启动参数加入 -Dthin.root=path/to/lib -->
-            <plugin>
-                <groupId>org.springframework.boot.experimental</groupId>
-                <artifactId>spring-boot-thin-maven-plugin</artifactId>
-                <version>1.0.23.RELEASE</version>
-                <executions>
-                    <execution>
-                        <!-- Download the dependencies at build time -->
-                        <id>resolve</id>
-                        <goals>
-                            <goal>resolve</goal>
-                        </goals>
-                        <inherited>false</inherited>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
-
     </build>
 
 </project>

@@ -2,7 +2,7 @@ package com.asiainfo.strategy.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * @author: Ares
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @description: Http请求连接池配置
  * @version: JDK 1.8
  */
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "http.connection.pool")
 public class HttpConnectionPoolConfig
 {

@@ -1,5 +1,6 @@
-package com.asiainfo.strategy.business;
+package com.asiainfo.strategy.business.impl;
 
+import com.asiainfo.strategy.business.TestProvider;
 import com.asiainfo.strategy.mapper.TestMapper;
 import com.asiainfo.strategy.multiple.datasources.TargetDataSource;
 import org.slf4j.Logger;

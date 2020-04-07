@@ -4,11 +4,9 @@ import com.asiainfo.frame.annotations.RemoteService;
 import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 import com.asiainfo.frame.base.ResponseEnum;
-import com.asiainfo.strategy.business.SharingStrategyBusService;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,9 +20,6 @@ import org.springframework.stereotype.Service;
 public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncService
 {
     private static final Logger logger = LoggerFactory.getLogger(SharingStrategyFuncServiceImpl.class);
-
-    @Autowired
-    private SharingStrategyBusService sharingStrategyBusService;
 
     /**
      * @author: Ares
