@@ -171,7 +171,7 @@ public class TestServiceImpl implements TestService
 
 
         testProvider.testInsertPayment();
-//        throw new RuntimeException();
+        throw new RuntimeException();
 
 //                try
 //                {

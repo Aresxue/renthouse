@@ -37,7 +37,7 @@ public class TestProviderImpl implements TestProvider
 
 
     @Override
-//    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TargetDataSource(dataSourceId = "datasourceOne")
     public void testInsertPayment()
     {
@@ -45,6 +45,6 @@ public class TestProviderImpl implements TestProvider
         {
             testMapper.testInsertPayment(i);
         }
-        throw new RuntimeException();
+//        throw new RuntimeException();
     }
 }
