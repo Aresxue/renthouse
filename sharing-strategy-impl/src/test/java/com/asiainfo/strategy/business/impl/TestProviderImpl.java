@@ -36,8 +36,15 @@ public class TestProviderImpl implements TestProvider
     }
 
 
+    /**
+     * @author: Ares
+     * @description: 不支持Propagation.REQUIRES_NEW
+     * @date: 2020/4/10 19:09
+     * @param: [] 请求参数
+     * @return: void 响应参数
+     */
     @Override
-    @Transactional(transactionManager = "dynamicDataSourceTransactionManagerDemo")
+    @Transactional(transactionManager = "dynamicDataSourceTransactionManagerDemo", propagation = Propagation.REQUIRED)
     @TargetDataSource(dataSourceId = "datasourceOne")
     public void testInsertPayment()
     {
@@ -45,6 +52,6 @@ public class TestProviderImpl implements TestProvider
         {
             testMapper.testInsertPayment(i);
         }
-//        throw new RuntimeException();
+        throw new RuntimeException();
     }
 }

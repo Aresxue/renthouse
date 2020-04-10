@@ -154,7 +154,7 @@ public class TestServiceImpl implements TestService
      * @return: int 响应参数
      */
     @Override
-    @Transactional(transactionManager = "dynamicDataSourceTransactionManagerDemo")
+//    @Transactional(transactionManager = "dynamicDataSourceTransactionManagerDemo")
     @TargetDataSource
     public void testInsertPayment()
     {
@@ -171,6 +171,7 @@ public class TestServiceImpl implements TestService
 
 
         testProvider.testInsertPayment();
+//        throw new RuntimeException();
 //        try
 //        {
 //            testProvider.testInsertPayment();
