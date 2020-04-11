@@ -37,7 +37,7 @@ public class TestProviderImpl implements TestProvider
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     @TargetDataSource(dataSourceId = "datasourceOne")
     public void testInsertPayment()
     {

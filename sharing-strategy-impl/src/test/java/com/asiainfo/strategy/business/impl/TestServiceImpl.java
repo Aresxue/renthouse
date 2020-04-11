@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DEFAULT_TARGET_DATASOURCE;
@@ -154,7 +155,7 @@ public class TestServiceImpl implements TestService
      * @return: int 响应参数
      */
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     @TargetDataSource
     public void testInsertPayment()
     {
@@ -171,7 +172,7 @@ public class TestServiceImpl implements TestService
 
 
         testProvider.testInsertPayment();
-        throw new RuntimeException();
+//        throw new RuntimeException();
 
 //                try
 //                {
