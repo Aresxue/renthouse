@@ -66,6 +66,8 @@ public class DynamicDataSourceTransaction implements Transaction
         // 链接不存在时获取链接, 这里是关键, 使用原生的getConnection,
         // 会执行AbstractRoutingDataSource的逻辑获取想要的链接
         Connection connection = dataSource.getConnection();
+        // 关闭连接的自动提交
+        connection.setAutoCommit(false);
         this.autoCommitMap.put(dataSourceId, connection.getAutoCommit());
         connectionMap.put(dataSourceId, connection);
 

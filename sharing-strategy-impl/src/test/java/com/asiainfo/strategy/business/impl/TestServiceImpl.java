@@ -113,7 +113,6 @@ public class TestServiceImpl implements TestService
      * 使用默认传播级别 即当当前存在事务即加入没有则新起时 依旧无法切换数据源
      * 使用REQUIRES_NEW时 使用DynamicDataSourceUtil.changeDataSource(datasourceId)依旧没法改变数据源, 但注解TargetDataSource设置的数据源生效了, 接着尝试了NESTED会直接报错, NOT_SUPPORTED也可以切换但是以非事务运行可用于查询
      * 对于原生的mysql, NESTED并不会报错但无法执行切换
-     * 上面发生的原因是对于同一个类中的方法, 调用的时候不会调用它的代理类中的方法而是本类中的方法, 对于其他类的方法则是会调用代理类的方法,aop的逻辑才会执行(可能不只一个)
      * @date: 2020/3/26 14:35
      * @param: [] 请求参数
      * @return: void 响应参数
@@ -156,7 +155,7 @@ public class TestServiceImpl implements TestService
      * @return: int 响应参数
      */
     @Override
-    @Transactional(transactionManager = "dynamicDataSourceTransactionManagerDemo", propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     @TargetDataSource
     public void testInsertPayment()
     {
@@ -173,13 +172,15 @@ public class TestServiceImpl implements TestService
 
 
         testProvider.testInsertPayment();
-//        try
-//        {
-//            testProvider.testInsertPayment();
-//        } catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
+//        throw new RuntimeException();
+
+//                try
+//                {
+//                    testProvider.testInsertPayment();
+//                } catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
     }
 
     //    @Transactional
