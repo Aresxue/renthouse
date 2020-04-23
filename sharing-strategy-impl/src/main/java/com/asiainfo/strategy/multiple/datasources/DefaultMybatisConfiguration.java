@@ -15,11 +15,11 @@ import javax.sql.DataSource;
 /**
  * @author: Ares
  * @date: 2020/3/19 12:16
- * @description: 默认数据源配置类
+ * @description: 默认mybatis配置类
  * @version: JDK 1.8
  */
 @Configuration
-public class DefaultDataSourceConfiguration
+public class DefaultMybatisConfiguration
 {
     /**
      * @author: Ares
@@ -34,7 +34,6 @@ public class DefaultDataSourceConfiguration
     {
         return DruidDataSourceBuilder.create().build();
     }
-
 
     @Bean
     public SqlSessionFactory sqlSessionFactory() throws Exception
