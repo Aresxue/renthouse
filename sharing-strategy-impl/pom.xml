@@ -76,24 +76,28 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!--<plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
-                        <!-- 加入该配置，使用maven package，依赖jar不会打包在项目最终jar文件内 -->
+                        &lt;!&ndash; 加入该配置，使用maven package，依赖jar不会打包在项目最终jar文件内 &ndash;&gt;
                         <groupId>org.springframework.boot.experimental</groupId>
                         <artifactId>spring-boot-thin-layout</artifactId>
                         <version>1.0.23.RELEASE</version>
                     </dependency>
                 </dependencies>
             </plugin>
-            <!-- 加入该配置，maven package执行时会在target目录整理好依赖包 -->
-            <!-- 启动参数加入 -Dthin.root=path/to/lib -->
+            &lt;!&ndash; 加入该配置，maven package执行时会在target目录整理好依赖包 &ndash;&gt;
+            &lt;!&ndash; 启动参数加入 -Dthin.root=path/to/lib &ndash;&gt;
             <plugin>
                 <groupId>org.springframework.boot.experimental</groupId>
                 <artifactId>spring-boot-thin-maven-plugin</artifactId>
                 <version>1.0.23.RELEASE</version>
                 <executions>
                     <execution>
-                        <!-- Download the dependencies at build time -->
+                        &lt;!&ndash; Download the dependencies at build time &ndash;&gt;
                         <id>resolve</id>
                         <goals>
                             <goal>resolve</goal>
@@ -101,7 +105,7 @@
                         <inherited>false</inherited>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
 
     </build>
