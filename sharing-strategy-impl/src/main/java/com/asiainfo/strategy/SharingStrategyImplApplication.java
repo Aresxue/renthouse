@@ -1,8 +1,6 @@
 package com.asiainfo.strategy;
 
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
-import com.asiainfo.strategy.multiple.datasources.MultipleMybatisConfiguration;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -22,10 +20,9 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.config",
         "com.asiainfo.strategy.multiple.datasources",
         "com.asiainfo.strategy.mapper",
-        "com.asiainfo.strategy.aop"},
-        exclude = {MybatisAutoConfiguration.class})
+        "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
-@Import({HttpConnectionPoolConfig.class, MultipleMybatisConfiguration.class})
+@Import({HttpConnectionPoolConfig.class})
 public class SharingStrategyImplApplication
 {
 
