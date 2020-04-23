@@ -1,7 +1,6 @@
 package com.asiainfo.strategy;
 
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
-import com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -23,9 +22,9 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.multiple.datasources",
         "com.asiainfo.strategy.mapper",
         "com.asiainfo.strategy.aop"},
-        exclude = DataSourceAutoConfiguration.class)
+        exclude = {DataSourceAutoConfiguration.class})
 @EnableEurekaClient
-@Import({HttpConnectionPoolConfig.class, DynamicDataSourceConfiguration.class})
+@Import({HttpConnectionPoolConfig.class})
 public class SharingStrategyImplApplication
 {
 
