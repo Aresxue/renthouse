@@ -4,16 +4,12 @@ import com.asiainfo.strategy.business.TestProvider;
 import com.asiainfo.strategy.business.TestService;
 import com.asiainfo.strategy.mapper.TestMapper;
 import com.asiainfo.strategy.mapper.TestMapperTwo;
-import com.asiainfo.strategy.multiple.datasources.DynamicDataSourceUtil;
-import com.asiainfo.strategy.multiple.datasources.TargetDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.asiainfo.strategy.multiple.datasources.DynamicDataSourceConstans.DEFAULT_TARGET_DATASOURCE;
 
 /**
  * @author: Ares
@@ -45,28 +41,7 @@ public class TestServiceImpl implements TestService
     @Override
     public void testDynamicDataSource()
     {
-        int value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
 
-        DynamicDataSourceUtil.changeDataSource("datasourceOne");
-        value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
-
-        DynamicDataSourceUtil.changeDataSource("datasourceTwo");
-        value = testMapper.testDynamicDataSource();
-        DynamicDataSourceUtil.clearDataSourceId();
-        LOGGER.info("返回的payment_id为: {}", value);
-
-        DynamicDataSourceUtil.changeDataSource("datasourceOne");
-        value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
-
-        DynamicDataSourceUtil.changeDataSource(DEFAULT_TARGET_DATASOURCE);
-        value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
     }
 
     @Override
@@ -93,28 +68,7 @@ public class TestServiceImpl implements TestService
     @Transactional
     public void testDynamicDataSourceTransactional()
     {
-        int value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
 
-        DynamicDataSourceUtil.changeDataSource("datasourceOne");
-        value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
-
-        DynamicDataSourceUtil.changeDataSource("datasourceTwo");
-        value = testMapper.testDynamicDataSource();
-        DynamicDataSourceUtil.clearDataSourceId();
-        LOGGER.info("返回的payment_id为: {}", value);
-
-        DynamicDataSourceUtil.changeDataSource("datasourceOne");
-        value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
-
-        DynamicDataSourceUtil.changeDataSource(DEFAULT_TARGET_DATASOURCE);
-        value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
     }
 
     /**
@@ -135,24 +89,7 @@ public class TestServiceImpl implements TestService
     @Transactional
     public void testDynamicDataSourceTransactionalUseMethod()
     {
-        int value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
 
-        selectPaymentId("datasourceOne");
-
-        selectPaymentId("datasourceTwo");
-
-        selectPaymentId("datasourceOne");
-
-        selectPaymentId(DEFAULT_TARGET_DATASOURCE);
-
-        testProvider.selectPaymentId("datasourceOne");
-
-        testProvider.selectPaymentId("datasourceTwo");
-
-        testProvider.selectPaymentId("datasourceOne");
-
-        testProvider.selectPaymentId(DEFAULT_TARGET_DATASOURCE);
 
     }
 
@@ -170,7 +107,6 @@ public class TestServiceImpl implements TestService
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    @TargetDataSource
     public void testInsertPayment()
     {
         for (int i = 0; i < 100; i++)
@@ -198,12 +134,8 @@ public class TestServiceImpl implements TestService
     }
 
     //    @Transactional
-    @TargetDataSource(dataSourceId = "datasourceOne")
     public void selectPaymentId(String datasourceId)
     {
-        DynamicDataSourceUtil.changeDataSource(datasourceId);
-        int value = testMapper.testDynamicDataSource();
-        LOGGER.info("返回的payment_id为: {}", value);
-        DynamicDataSourceUtil.clearDataSourceId();
+
     }
 }
