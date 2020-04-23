@@ -46,14 +46,15 @@ import java.util.Set;
 @RequestMapping(value = "/common")
 public class CommonController
 {
-    private static final Logger logger = LoggerFactory.getLogger(CommonController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonController.class);
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER;
 
     static
     {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        OBJECT_MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     }
 
     /**
@@ -105,11 +106,11 @@ public class CommonController
             String serviceId = request.getParameter("serviceId");
             Method method = UNIFIED_SERVICE_MAP.get(serviceId);
             Object bean = SpringUtil.getBean(serviceId);
-            Object requestParam = objectMapper.readValue(requestObject, method.getParameterTypes()[0]);
+            Object requestParam = OBJECT_MAPPER.readValue(requestObject, method.getParameterTypes()[0]);
             return method.invoke(bean, requestParam);
         } catch (Exception e)
         {
-            logger.error("{}: ", ResponseEnum.UNKNOWN_ERROR.getResponseDesc(), e);
+            LOGGER.error("{}: ", ResponseEnum.UNKNOWN_ERROR.getResponseDesc(), e);
             ResponseBase response = new ResponseBase();
             response.setResponseEnum(ResponseEnum.UNKNOWN_ERROR);
             return response;
@@ -130,20 +131,20 @@ public class CommonController
         List<RemoteProxyService> proxyServices = REMOTE_PROXY_SERVICE.get(Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString());
         if (null == proxyServices)
         {
-            logger.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
+            LOGGER.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
             response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
         if (proxyServices.size() > 1)
         {
-            logger.error(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE.getResponseDesc());
+            LOGGER.error(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE.getResponseDesc());
             response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE);
             return response;
         }
         RemoteProxyService service = proxyServices.get(0);
         if (null == service || null == service.getProxyService() || null == service.getProxyMethod())
         {
-            logger.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
+            LOGGER.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
             response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
@@ -166,7 +167,7 @@ public class CommonController
             return method.invoke(service.getProxyService(), params);
         } catch (Exception e)
         {
-            logger.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
+            LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
             response.setResponseEnum(ResponseEnum.INVOKE_FAILURE);
         }
         return response;
@@ -228,7 +229,7 @@ public class CommonController
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException | InvocationTargetException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
             }// 字符串
@@ -243,7 +244,7 @@ public class CommonController
                         return DateUtil.parse(tempValue);
                     } catch (Exception e)
                     {
-                        logger.warn("{}: {}", ResponseEnum.INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), tempValue);
+                        LOGGER.warn("{}: {}", ResponseEnum.INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), tempValue);
                     }
                 }
                 return tempValue;
@@ -255,7 +256,7 @@ public class CommonController
                     return DateUtil.parse(value.toString().replaceAll("\"", ""));
                 } catch (ParseException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_DATE_ERROR);
                 }
             }
@@ -272,13 +273,13 @@ public class CommonController
                     String str;
                     if (flag.booleanValue())
                     {
-                        str = objectMapper.writeValueAsString(value);
+                        str = OBJECT_MAPPER.writeValueAsString(value);
                     }
                     else
                     {
                         str = value.toString();
                     }
-                    Object object = objectMapper.readValue(str, clazz);
+                    Object object = OBJECT_MAPPER.readValue(str, clazz);
                     flag.setValue(true);
                     Method method = clazz.getMethod("entrySet");
                     Set<Map.Entry> entrySet = (Set<Map.Entry>) method.invoke(object);
@@ -287,7 +288,7 @@ public class CommonController
                     if (clazz.isInterface())
                     {
                         // 默认实现类选取HashMap
-                        map = new HashMap();
+                        map = new HashMap<>();
                     }
                     else
                     {
@@ -302,11 +303,11 @@ public class CommonController
                     return map;
                 } catch (IOException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
                 } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
             }// 集合
@@ -318,23 +319,23 @@ public class CommonController
                     String str;
                     if (flag.booleanValue())
                     {
-                        str = objectMapper.writeValueAsString(value);
+                        str = OBJECT_MAPPER.writeValueAsString(value);
                     }
                     else
                     {
                         str = value.toString();
                     }
-                    Collection valueCollection = objectMapper.readValue(str, Collection.class);
+                    Collection valueCollection = OBJECT_MAPPER.readValue(str, Collection.class);
                     flag.setValue(true);
                     Collection collection;
 
                     if (requestType.isInterface() && List.class.isAssignableFrom(requestType))
                     {
-                        collection = new ArrayList();
+                        collection = new ArrayList<>();
                     }
                     else if (requestType.isInterface() && Set.class.isAssignableFrom(requestType))
                     {
-                        collection = new HashSet();
+                        collection = new HashSet<>();
                     }
                     else
                     {
@@ -347,11 +348,11 @@ public class CommonController
                     return collection;
                 } catch (IOException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
                 } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
             }
@@ -360,14 +361,14 @@ public class CommonController
                 try
                 {
                     Class<?> clazz = Class.forName(requestType.getName());
-                    return objectMapper.readValue(value.toString(), clazz);
+                    return OBJECT_MAPPER.readValue(value.toString(), clazz);
                 } catch (IOException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
                 } catch (ClassNotFoundException e)
                 {
-                    logger.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
             }
