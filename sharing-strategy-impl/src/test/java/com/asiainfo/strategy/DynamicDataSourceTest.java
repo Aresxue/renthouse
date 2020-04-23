@@ -20,11 +20,17 @@ public class DynamicDataSourceTest
     @Autowired
     private TestService testService;
 
-    //    @Test
-    //    public void testDynamicDataSource()
-    //    {
-    //        testService.testDynamicDataSource();
-    //    }
+    @Test
+    public void testDynamicDataSourceMapper()
+    {
+        testService.testDynamicDataSourceMapper();
+    }
+
+    //        @Test
+    //        public void testDynamicDataSource()
+    //        {
+    //            testService.testDynamicDataSource();
+    //        }
 
     //    @Test
     //    public void testDynamicDataSourceTransactional()
@@ -46,10 +52,10 @@ public class DynamicDataSourceTest
      * @param: [] 请求参数
      * @return: void 响应参数
      */
-    @Test
-    public void testInsertPayment()
-    {
-        testService.testInsertPayment();
-    }
+    //    @Test
+    //    public void testInsertPayment()
+    //    {
+    //        testService.testInsertPayment();
+    //    }
 }
 

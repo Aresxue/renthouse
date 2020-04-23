@@ -3,6 +3,7 @@ package com.asiainfo.strategy.business.impl;
 import com.asiainfo.strategy.business.TestProvider;
 import com.asiainfo.strategy.business.TestService;
 import com.asiainfo.strategy.mapper.TestMapper;
+import com.asiainfo.strategy.mapper.TestMapperTwo;
 import com.asiainfo.strategy.multiple.datasources.DynamicDataSourceUtil;
 import com.asiainfo.strategy.multiple.datasources.TargetDataSource;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ public class TestServiceImpl implements TestService
 
     @Autowired
     private TestMapper testMapper;
+
+    @Autowired
+    private TestMapperTwo testMapperTwo;
 
     @Autowired
     private TestProvider testProvider;
@@ -63,6 +67,16 @@ public class TestServiceImpl implements TestService
         value = testMapper.testDynamicDataSource();
         LOGGER.info("返回的payment_id为: {}", value);
         DynamicDataSourceUtil.clearDataSourceId();
+    }
+
+    @Override
+    public void testDynamicDataSourceMapper()
+    {
+        int value = testMapper.testDynamicDataSource();
+        LOGGER.info("返回的payment_id为: {}", value);
+
+        value = testMapperTwo.testDynamicDataSource();
+        LOGGER.info("返回的payment_id为: {}", value);
     }
 
 
@@ -172,15 +186,15 @@ public class TestServiceImpl implements TestService
 
 
         testProvider.testInsertPayment();
-//        throw new RuntimeException();
+        //        throw new RuntimeException();
 
-//                try
-//                {
-//                    testProvider.testInsertPayment();
-//                } catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
+        //                try
+        //                {
+        //                    testProvider.testInsertPayment();
+        //                } catch (Exception e)
+        //                {
+        //                    e.printStackTrace();
+        //                }
     }
 
     //    @Transactional

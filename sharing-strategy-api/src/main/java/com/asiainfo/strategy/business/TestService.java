@@ -16,6 +16,14 @@ public interface TestService
      * @return: int 响应参数
      */
     void testDynamicDataSource();
+    /**
+     * @author: Ares
+     * @description: 通过mapper隔离实现多数据源
+     * @date: 2020/4/23 14:26
+     * @param: [] 请求参数
+     * @return: void 响应参数
+     */
+    void testDynamicDataSourceMapper();
 
     /**
      * @author: Ares
