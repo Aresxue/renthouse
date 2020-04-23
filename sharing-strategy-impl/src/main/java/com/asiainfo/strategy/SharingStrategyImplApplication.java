@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.config",
         "com.asiainfo.strategy.multiple.datasources",
         "com.asiainfo.strategy.mapper"},
-        exclude = DataSourceAutoConfiguration.class)
+        exclude = {DataSourceAutoConfiguration.class})
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class})
 public class SharingStrategyImplApplication
