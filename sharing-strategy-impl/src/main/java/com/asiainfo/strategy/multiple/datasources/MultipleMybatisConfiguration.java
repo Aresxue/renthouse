@@ -19,10 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -92,7 +96,6 @@ public class MultipleMybatisConfiguration implements InitializingBean
         }
 
     }
-
 
     @Bean
     @ConditionalOnMissingBean
@@ -206,30 +209,48 @@ public class MultipleMybatisConfiguration implements InitializingBean
         }
     }
 
-    public static class AutoConfiguredMapperScannerRegistrar implements ImportBeanDefinitionRegistrar
+    public static class AutoConfiguredMapperScannerRegistrar implements BeanFactoryAware, ImportBeanDefinitionRegistrar
     {
+        private BeanFactory beanFactory;
+
         @Override
         public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata, @NonNull BeanDefinitionRegistry registry)
         {
-            registryMybatisConfiguration(registry, "");
+            if (!AutoConfigurationPackages.has(beanFactory))
+            {
+                MultipleMybatisConfiguration.LOGGER.debug("Could not determine auto-configuration package, automatic mapper scanning disabled.");
+            }
+            else
+            {
+                MultipleMybatisConfiguration.LOGGER.debug("Searching for mappers annotated with @Mapper");
+                List<String> packages = new ArrayList<>();
+                packages.add("com.asiainfo.strategy");
+                if (MultipleMybatisConfiguration.LOGGER.isDebugEnabled())
+                {
+                    packages.forEach((pkg) -> {
+                        MultipleMybatisConfiguration.LOGGER.debug("Using auto-configuration base package '{}'", pkg);
+                    });
+                }
+
+                BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
+                builder.addPropertyValue("processPropertyPlaceHolders", true);
+                builder.addPropertyValue("annotationClass", Mapper.class);
+                builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(packages));
+                BeanWrapper beanWrapper = new BeanWrapperImpl(MapperScannerConfigurer.class);
+                Stream.of(beanWrapper.getPropertyDescriptors())
+                        .filter((x) -> "lazyInitialization".equals(x.getName()))
+                        .findAny()
+                        .ifPresent((x) -> {
+                    builder.addPropertyValue("lazyInitialization", "${mybatis.lazy-initialization:false}");
+                });
+                registry.registerBeanDefinition(MapperScannerConfigurer.class.getName(), builder.getBeanDefinition());
+            }
         }
 
-        private void registryMybatisConfiguration(BeanDefinitionRegistry registry, String datasourceId)
+        @Override
+        public void setBeanFactory(BeanFactory beanFactory) throws BeansException
         {
-            List<String> packages = new ArrayList<>();
-            packages.add("com.asiainfo.strategy");
-
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
-            builder.addPropertyValue("processPropertyPlaceHolders", true);
-            builder.addPropertyValue("annotationClass", Mapper.class);
-            builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(packages));
-            BeanWrapper beanWrapper = new BeanWrapperImpl(MapperScannerConfigurer.class);
-            Stream.of(beanWrapper.getPropertyDescriptors()).filter((x) -> "lazyInitialization".equals(x.getName())).findAny().ifPresent((x) -> {
-                builder.addPropertyValue("lazyInitialization", "${mybatis.lazy-initialization:false}");
-            });
-
-//            builder.addPropertyValue("sqlSessionFactoryBeanName", "sqlSessionFactory" + datasourceId);
-//            builder.addPropertyValue("sqlSessionTemplateBeanName", "sqlSessionTemplate" + datasourceId);
+            this.beanFactory = beanFactory;
         }
     }
 }
