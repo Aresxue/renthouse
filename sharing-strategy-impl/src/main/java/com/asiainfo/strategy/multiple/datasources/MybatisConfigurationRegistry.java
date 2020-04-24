@@ -21,6 +21,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationScopeMetadataResolver;
@@ -35,7 +36,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -130,8 +130,8 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
 
     private void registerMybatisConfiguration(BeanDefinitionRegistry registry, @NonNull String datasourceId)
     {
+        List<String> packages = AutoConfigurationPackages.get(applicationContext.getAutowireCapableBeanFactory());
         String basePackages = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis" + ".basePackages");
-        List<String> packages = Collections.EMPTY_LIST;
         if (!StringUtils.isEmpty(basePackages))
         {
             packages = Arrays.asList(basePackages.split(CUSTOM_DATASOURCE_DELIMITER));
