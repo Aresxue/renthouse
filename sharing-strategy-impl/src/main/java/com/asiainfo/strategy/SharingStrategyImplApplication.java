@@ -1,7 +1,6 @@
 package com.asiainfo.strategy;
 
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
-import com.asiainfo.strategy.multiple.datasources.MultipleMybatisConfiguration;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,7 +23,7 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.mapper",
         "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
-@Import({HttpConnectionPoolConfig.class, MultipleMybatisConfiguration.class})
+@Import({HttpConnectionPoolConfig.class})
 @MapperScan(basePackages = {"com.asiainfo.strategy.mapper"})
 public class SharingStrategyImplApplication
 {
