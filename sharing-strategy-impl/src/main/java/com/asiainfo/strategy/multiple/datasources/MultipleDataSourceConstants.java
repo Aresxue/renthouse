@@ -17,10 +17,6 @@ public class MultipleDataSourceConstants
      */
     public static final String CUSTOM_DATASOURCE_PREFIX = "custom.datasource.";
     /**
-     * 自定义数据源配置文件名
-     */
-    public static final String CUSTOM_DATASOURCE_PROPERTIES = "custom-datasource.properties";
-    /**
      * 自定义数据源配置信息分隔符
      */
     public static final String CUSTOM_DATASOURCE_DELIMITER = ",";

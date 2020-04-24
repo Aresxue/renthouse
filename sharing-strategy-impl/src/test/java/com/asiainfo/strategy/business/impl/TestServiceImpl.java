@@ -3,7 +3,8 @@ package com.asiainfo.strategy.business.impl;
 import com.asiainfo.strategy.business.TestProvider;
 import com.asiainfo.strategy.business.TestService;
 import com.asiainfo.strategy.mapper.TestMapper;
-import com.asiainfo.strategy.mapper.TestMapperTwo;
+import com.asiainfo.strategy.mapper.datasourceOne.TestMapperOne;
+import com.asiainfo.strategy.mapper.datasourceTwo.TestMapperTwo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class TestServiceImpl implements TestService
 
     @Autowired
     private TestMapper testMapper;
+
+    @Autowired
+    private TestMapperOne testMapperOne;
 
     @Autowired
     private TestMapperTwo testMapperTwo;
@@ -48,6 +52,9 @@ public class TestServiceImpl implements TestService
     public void testDynamicDataSourceMapper()
     {
         int value = testMapper.testDynamicDataSource();
+        LOGGER.info("返回的payment_id为: {}", value);
+
+        value = testMapperOne.testDynamicDataSource();
         LOGGER.info("返回的payment_id为: {}", value);
 
         value = testMapperTwo.testDynamicDataSource();

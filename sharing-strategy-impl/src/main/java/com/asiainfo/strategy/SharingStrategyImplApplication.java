@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.business.impl",
         "com.asiainfo.strategy.config",
         "com.asiainfo.strategy.multiple.datasources",
-        "com.asiainfo.strategy.mapper",
+        "com.asiainfo.strategy.mapper", "com.asiainfo.strategy.datasourceOne", "com.asiainfo.strategy.datasourceTwo",
         "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class})
