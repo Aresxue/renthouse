@@ -101,7 +101,6 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
 
                 ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(annotatedBeanDefinition);
                 annotatedBeanDefinition.setScope(scopeMetadata.getScopeName());
-
                 annotatedBeanDefinition.setAutowireCandidate(true);
                 annotatedBeanDefinition.getPropertyValues().addPropertyValue("remoteInfcClass", clazz);
                 annotatedBeanDefinition.getPropertyValues().addPropertyValue("serviceCenter", service.getServiceCenter());

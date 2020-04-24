@@ -28,5 +28,3 @@ eureka:
       defaultZone: http://${eureka.instance.hostname}:${eureka.client.eureka-server-port}/eureka/
 
 
-
-

@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.SQL_SESSION_FACTORY_BEAN_NAME;
+import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.SQL_SESSION_TEMPLATE_BEAN_NAME;
+
 @Configuration
 public class MultipleMybatisConfiguration implements  ImportBeanDefinitionRegistrar
 {
@@ -24,7 +27,7 @@ public class MultipleMybatisConfiguration implements  ImportBeanDefinitionRegist
     private void registerMybatisConfiguration(BeanDefinitionRegistry registry, String datasourceId)
     {
         List<String> packages = new ArrayList<>();
-        packages.add("com.asiainfo.strategy");
+        packages.add("com.asiainfo.strategy.mapper");
         if (LOGGER.isDebugEnabled())
         {
             LOGGER.debug("Searching for mappers annotated with @Mapper");
@@ -38,15 +41,12 @@ public class MultipleMybatisConfiguration implements  ImportBeanDefinitionRegist
         builder.addPropertyValue("annotationClass", Mapper.class);
         builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(packages));
         BeanWrapper beanWrapper = new BeanWrapperImpl(MapperScannerConfigurer.class);
-        Stream.of(beanWrapper.getPropertyDescriptors())
-                .filter((x) -> "lazyInitialization".equals(x.getName()))
-                .findAny()
-                .ifPresent((x) -> {
-                    builder.addPropertyValue("lazyInitialization", "${mybatis.lazy-initialization:false}");
-                });
+        Stream.of(beanWrapper.getPropertyDescriptors()).filter((x) -> "lazyInitialization".equals(x.getName())).findAny().ifPresent((x) -> {
+            builder.addPropertyValue("lazyInitialization", "${mybatis.lazy-initialization:false}");
+        });
 
-        builder.addPropertyValue("sqlSessionFactoryBeanName", "sqlSessionFactory"+datasourceId);
-        builder.addPropertyValue("sqlSessionTemplateBeanName", "sqlSessionTemplate"+datasourceId);
+        builder.addPropertyValue("sqlSessionFactoryBeanName", SQL_SESSION_FACTORY_BEAN_NAME + datasourceId);
+        builder.addPropertyValue("sqlSessionTemplateBeanName", SQL_SESSION_TEMPLATE_BEAN_NAME + datasourceId);
         registry.registerBeanDefinition(MapperScannerConfigurer.class.getName(), builder.getBeanDefinition());
     }
 }
