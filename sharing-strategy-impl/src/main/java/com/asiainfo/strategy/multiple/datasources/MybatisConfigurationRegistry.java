@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -22,12 +24,12 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.AnnotationScopeMetadataResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ScopeMetadata;
 import org.springframework.context.annotation.ScopeMetadataResolver;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -53,18 +55,19 @@ import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConst
  * @version: JDK 1.8
  */
 @Configuration
-public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware
+public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostProcessor, EnvironmentAware, BeanFactoryAware
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MybatisConfigurationRegistry.class);
 
     private final ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
-    private ApplicationContext applicationContext;
+    private Environment environment;
+    private BeanFactory beanFactory;
 
     @Override
     public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException
     {
-        String customDatasourceIds = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_IDS);
+        String customDatasourceIds = environment.getProperty(CUSTOM_DATASOURCE_IDS);
         if (null != customDatasourceIds)
         {
             Arrays.stream(customDatasourceIds.split(CUSTOM_DATASOURCE_DELIMITER)).forEach(datasourceId -> {
@@ -101,14 +104,14 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
 
         // 指定数据源
         DruidDataSource druidDataSource = new DruidDataSource();
-        Properties properties = SpringUtil.getPropertiesByPrefix(applicationContext.getEnvironment(), CUSTOM_DATASOURCE_PREFIX + datasourceId);
+        Properties properties = SpringUtil.getPropertiesByPrefix(environment, CUSTOM_DATASOURCE_PREFIX + datasourceId);
         // 将属性的key中的中划线-转为小驼峰式, 如druid.test-while-idle转为如druid.testWhileIdle
         properties.stringPropertyNames().forEach(propertyNames -> properties.setProperty(StringUtil.strikeToLittleCamelCase(propertyNames), properties.getProperty(propertyNames)));
         druidDataSource.configFromPropety(properties);
         annotatedBeanDefinition.getPropertyValues().addPropertyValue("dataSource", druidDataSource);
 
         // 指定*Mapper.xml目录
-        String mapperFolder = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis.mapper.locations");
+        String mapperFolder = environment.getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis.mapper.locations");
         if (StringUtils.isEmpty(mapperFolder))
         {
             LOGGER.info("*Mapper.xml资源地址配置项为空, 根据默认地址获取*Mapper.xml资源");
@@ -130,8 +133,8 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
 
     private void registerMybatisConfiguration(BeanDefinitionRegistry registry, @NonNull String datasourceId)
     {
-        List<String> packages = AutoConfigurationPackages.get(applicationContext.getAutowireCapableBeanFactory());
-        String basePackages = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis" + ".basePackages");
+        List<String> packages = AutoConfigurationPackages.get(beanFactory);
+        String basePackages = environment.getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis" + ".basePackages");
         if (!StringUtils.isEmpty(basePackages))
         {
             packages = Arrays.asList(basePackages.split(CUSTOM_DATASOURCE_DELIMITER));
@@ -164,8 +167,14 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
     }
 
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException
+    public void setEnvironment(@NonNull Environment environment)
     {
-        this.applicationContext = applicationContext;
+        this.environment = environment;
+    }
+
+    @Override
+    public void setBeanFactory(@NonNull BeanFactory beanFactory) throws BeansException
+    {
+        this.beanFactory = beanFactory;
     }
 }
