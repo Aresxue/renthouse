@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -59,11 +60,11 @@ import java.util.concurrent.TimeUnit;
  * 请求由连接池维护
  * @version: JDK 1.8
  */
+@Component
 public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
 
-    @Autowired
     private static HttpConnectionPoolConfig config;
 
     /**
@@ -448,6 +449,12 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
         {
             config = SpringUtil.getBean(HttpConnectionPoolConfig.class);
         }
+    }
+
+    @Autowired
+    public static void setConfig(HttpConnectionPoolConfig config)
+    {
+        HttpClientUtil.config = config;
     }
 
     public static class MonitorHttpWorker implements Runnable
