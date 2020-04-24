@@ -6,14 +6,13 @@ import com.asiainfo.frame.utils.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.mapper.ClassPathMapperScanner;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -24,12 +23,12 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
-import org.springframework.context.EnvironmentAware;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationScopeMetadataResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ScopeMetadata;
 import org.springframework.context.annotation.ScopeMetadataResolver;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -55,19 +54,18 @@ import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConst
  * @version: JDK 1.8
  */
 @Configuration
-public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostProcessor, BeanFactoryAware, EnvironmentAware
+public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MybatisConfigurationRegistry.class);
 
     private final ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
-    private Environment environment;
-    private BeanFactory beanFactory;
+    private ApplicationContext applicationContext;
 
     @Override
     public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException
     {
-        String customDatasourceIds = environment.getProperty(CUSTOM_DATASOURCE_IDS);
+        String customDatasourceIds = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_IDS);
         if (!StringUtils.isEmpty(customDatasourceIds))
         {
             Arrays.stream(customDatasourceIds.split(CUSTOM_DATASOURCE_DELIMITER)).forEach(datasourceId -> {
@@ -77,6 +75,43 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
             });
         }
     }
+
+    /**
+     * @author: Ares
+     * @description: 注册Mapper的代理Bean
+     * @date: 2020/4/24 21:06
+     * @param: [beanDefinitionRegistry, datasourceId, packages, lazyInitialization]
+     * 类注册, 数据源标识, 扫描包名, 懒加载配置
+     * @return: void 响应参数
+     */
+    private void registerMapperBeanDefinition(BeanDefinitionRegistry beanDefinitionRegistry, String datasourceId, List<String> packages, String lazyInitialization)
+    {
+        ClassPathMapperScanner scanner = new ClassPathMapperScanner(beanDefinitionRegistry);
+        scanner.setAddToConfig(true);
+        scanner.setAnnotationClass(Mapper.class);
+        scanner.setSqlSessionFactoryBeanName(SQL_SESSION_FACTORY_BEAN_NAME + StringUtil.upperFirst(datasourceId));
+        scanner.setSqlSessionTemplateBeanName(SQL_SESSION_TEMPLATE_BEAN_NAME + StringUtil.upperFirst(datasourceId));
+        scanner.setResourceLoader(applicationContext);
+        scanner.setBeanNameGenerator(null);
+        scanner.setMapperFactoryBeanClass(null);
+        if (StringUtils.hasText(lazyInitialization))
+        {
+            scanner.setLazyInitialization(Boolean.parseBoolean(lazyInitialization));
+        }
+
+        scanner.registerFilters();
+        String[] packageNames = new String[packages.size()];
+        packages.toArray(packageNames);
+        scanner.scan(packageNames);
+    }
+
+    /**
+     * @author: Ares
+     * @description: 注册sqlSessionTemplate
+     * @date: 2020/4/24 21:05
+     * @param: [beanDefinitionRegistry, datasourceId] 请求参数
+     * @return: void 响应参数
+     */
 
     private void registerSqlSessionTemplate(BeanDefinitionRegistry beanDefinitionRegistry, String datasourceId)
     {
@@ -93,6 +128,14 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         BeanDefinitionReaderUtils.registerBeanDefinition(beanDefinitionHolder, beanDefinitionRegistry);
     }
 
+
+    /**
+     * @author: Ares
+     * @description: 注册sqlSessionFactory
+     * @date: 2020/4/24 21:05
+     * @param: [beanDefinitionRegistry, datasourceId] 请求参数
+     * @return: void 响应参数
+     */
     private void registerSqlSessionFactory(@NonNull BeanDefinitionRegistry beanDefinitionRegistry, String datasourceId)
     {
         AnnotatedBeanDefinition annotatedBeanDefinition = new AnnotatedGenericBeanDefinition(SqlSessionFactoryBean.class);
@@ -104,14 +147,14 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
 
         // 指定数据源
         DruidDataSource druidDataSource = new DruidDataSource();
-        Properties properties = SpringUtil.getPropertiesByPrefix(environment, CUSTOM_DATASOURCE_PREFIX + datasourceId);
+        Properties properties = SpringUtil.getPropertiesByPrefix(applicationContext.getEnvironment(), CUSTOM_DATASOURCE_PREFIX + datasourceId);
         // 将属性的key中的中划线-转为小驼峰式, 如druid.test-while-idle转为如druid.testWhileIdle
         properties.stringPropertyNames().forEach(propertyNames -> properties.setProperty(StringUtil.strikeToLittleCamelCase(propertyNames), properties.getProperty(propertyNames)));
         druidDataSource.configFromPropety(properties);
         annotatedBeanDefinition.getPropertyValues().addPropertyValue("dataSource", druidDataSource);
 
         // 指定*Mapper.xml目录
-        String mapperFolder = environment.getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis.mapper.locations");
+        String mapperFolder = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis.mapper.locations");
         if (StringUtils.isEmpty(mapperFolder))
         {
             LOGGER.info("*Mapper.xml资源地址配置项为空, 根据默认地址获取*Mapper.xml资源");
@@ -131,10 +174,17 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         BeanDefinitionReaderUtils.registerBeanDefinition(beanDefinitionHolder, beanDefinitionRegistry);
     }
 
+    /**
+     * @author: Ares
+     * @description: 注册额外数据源的mybatis配置
+     * @date: 2020/4/24 21:05
+     * @param: [beanDefinitionRegistry, datasourceId] 请求参数
+     * @return: void 响应参数
+     */
     private void registerMybatisConfiguration(BeanDefinitionRegistry registry, @NonNull String datasourceId)
     {
-        List<String> packages = AutoConfigurationPackages.get(beanFactory);
-        String basePackages = environment.getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis" + ".basePackages");
+        List<String> packages = AutoConfigurationPackages.get(applicationContext.getAutowireCapableBeanFactory());
+        String basePackages = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis" + ".basePackages");
         if (!StringUtils.isEmpty(basePackages))
         {
             packages = Arrays.asList(basePackages.split(CUSTOM_DATASOURCE_DELIMITER));
@@ -156,6 +206,8 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         builder.addPropertyValue("sqlSessionFactoryBeanName", SQL_SESSION_FACTORY_BEAN_NAME + StringUtil.upperFirst(datasourceId));
         builder.addPropertyValue("sqlSessionTemplateBeanName", SQL_SESSION_TEMPLATE_BEAN_NAME + StringUtil.upperFirst(datasourceId));
 
+        // 注册Mapper的代理Bean
+        registerMapperBeanDefinition(registry, datasourceId, packages, String.valueOf(builder.getBeanDefinition().getPropertyValues().getPropertyValue("lazyInitialization")));
 
         registry.registerBeanDefinition(MapperScannerConfigurer.class.getName() + StringUtil.upperFirst(datasourceId), builder.getBeanDefinition());
     }
@@ -163,18 +215,11 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
     @Override
     public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException
     {
-
     }
 
     @Override
-    public void setEnvironment(@NonNull Environment environment)
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException
     {
-        this.environment = environment;
-    }
-
-    @Override
-    public void setBeanFactory(@NonNull BeanFactory beanFactory) throws BeansException
-    {
-        this.beanFactory = beanFactory;
+        this.applicationContext = applicationContext;
     }
 }
