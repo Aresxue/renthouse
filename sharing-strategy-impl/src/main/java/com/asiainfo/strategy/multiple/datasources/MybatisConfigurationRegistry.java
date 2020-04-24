@@ -6,7 +6,6 @@ import com.asiainfo.frame.utils.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.AnnotationScopeMetadataResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ScopeMetadata;
@@ -56,8 +55,7 @@ import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConst
  * @version: JDK 1.8
  */
 @Configuration
-@AutoConfigureBefore(MybatisAutoConfiguration.class)
-public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostProcessor, BeanFactoryAware
+public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostProcessor, BeanFactoryAware, EnvironmentAware
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MybatisConfigurationRegistry.class);
 
@@ -70,7 +68,7 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
     public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException
     {
         String customDatasourceIds = environment.getProperty(CUSTOM_DATASOURCE_IDS);
-        if (null != customDatasourceIds)
+        if (!StringUtils.isEmpty(customDatasourceIds))
         {
             Arrays.stream(customDatasourceIds.split(CUSTOM_DATASOURCE_DELIMITER)).forEach(datasourceId -> {
                 registerSqlSessionFactory(beanDefinitionRegistry, datasourceId);
@@ -168,11 +166,11 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
 
     }
 
-//    @Override
-//    public void setEnvironment(@NonNull Environment environment)
-//    {
-//        this.environment = environment;
-//    }
+    @Override
+    public void setEnvironment(@NonNull Environment environment)
+    {
+        this.environment = environment;
+    }
 
     @Override
     public void setBeanFactory(@NonNull BeanFactory beanFactory) throws BeansException
