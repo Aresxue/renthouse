@@ -114,7 +114,7 @@ public class TestServiceImpl implements TestService
      * @return: int 响应参数
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "atomikosJta")
     public void testInsertPayment()
     {
         for (int i = 0; i < 100; i++)

@@ -130,30 +130,34 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         annotatedBeanDefinition.setAutowireCandidate(false);
 
         Properties properties;
+        String mapperFolder;
         if (StringUtils.isEmpty(datasourceId))
         {
             properties = SpringUtil.getPropertiesByPrefix(applicationContext.getEnvironment(), "spring.datasource");
+            mapperFolder = applicationContext.getEnvironment().getProperty("mybatis.mapper-locations");
         }
         else
         {
             properties = SpringUtil.getPropertiesByPrefix(applicationContext.getEnvironment(), CUSTOM_DATASOURCE_PREFIX + datasourceId);
             // 指定*Mapper.xml目录
-            String mapperFolder = applicationContext.getEnvironment().getProperty(String.format(CUSTOM_DATASOURCE_MYBATIS_MAPPER_LOCATIONS, CUSTOM_DATASOURCE_PREFIX, datasourceId));
+            mapperFolder = applicationContext.getEnvironment().getProperty(String.format(CUSTOM_DATASOURCE_MYBATIS_MAPPER_LOCATIONS, CUSTOM_DATASOURCE_PREFIX, datasourceId));
             if (StringUtils.isEmpty(mapperFolder))
             {
                 LOGGER.info("*Mapper.xml资源地址配置项为空, 根据默认地址获取*Mapper.xml资源");
                 mapperFolder = String.format(DEFAULT_MAPPER_XML_CLASSPATH, datasourceId);
             }
-            try
-            {
-                ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-                Resource[] mapperLocations = resolver.getResources(mapperFolder);
-                annotatedBeanDefinition.getPropertyValues().addPropertyValue("mapperLocations", mapperLocations);
-            } catch (IOException e)
-            {
-                LOGGER.error("获取*Mapper.xml资源失败: ", e);
-            }
         }
+
+        try
+        {
+            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            Resource[] mapperLocations = resolver.getResources(mapperFolder);
+            annotatedBeanDefinition.getPropertyValues().addPropertyValue("mapperLocations", mapperLocations);
+        } catch (IOException e)
+        {
+            LOGGER.error("获取*Mapper.xml资源失败: ", e);
+        }
+
         // 将属性的key中的中划线-转为小驼峰式, 如druid.test-while-idle转为如druid.testWhileIdle
         properties.stringPropertyNames().forEach(propertyNames -> properties.setProperty(StringUtil.strikeToLittleCamelCase(propertyNames), properties.getProperty(propertyNames)));
         // 指定数据源

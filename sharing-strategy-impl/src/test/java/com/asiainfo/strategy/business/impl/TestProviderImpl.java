@@ -39,7 +39,7 @@ public class TestProviderImpl implements TestProvider
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "atomikosJta")
     public void testInsertPayment()
     {
         for (int i = 0; i < 100; i++)
