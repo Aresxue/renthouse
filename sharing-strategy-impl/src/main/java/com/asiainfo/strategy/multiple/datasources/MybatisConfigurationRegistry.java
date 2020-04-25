@@ -6,7 +6,6 @@ import com.asiainfo.frame.utils.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.mybatis.spring.mapper.ClassPathMapperScanner;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +42,17 @@ import java.util.stream.Stream;
 
 import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.CUSTOM_DATASOURCE_DELIMITER;
 import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.CUSTOM_DATASOURCE_IDS;
+import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.CUSTOM_DATASOURCE_MYBATIS_LAZY_INITIALIZATION;
+import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.CUSTOM_DATASOURCE_MYBATIS_MAPPER_LOCATIONS;
 import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.CUSTOM_DATASOURCE_PREFIX;
+import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.DEFAULT_MAPPER_XML_CLASSPATH;
 import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.SQL_SESSION_FACTORY_BEAN_NAME;
 import static com.asiainfo.strategy.multiple.datasources.MultipleDataSourceConstants.SQL_SESSION_TEMPLATE_BEAN_NAME;
 
 /**
  * @author: Ares
  * @date: 2020/4/23 20:25
- * @description: 注册sqlSessionFactory和sqlSessionTemplate, 提供给额外数据源使用
+ * @description: 注册sqlSessionFactory和sqlSessionTemplate, 提供给自定义数据源使用
  * @version: JDK 1.8
  */
 @Configuration
@@ -74,35 +76,6 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
                 registerMybatisConfiguration(beanDefinitionRegistry, datasourceId);
             });
         }
-    }
-
-    /**
-     * @author: Ares
-     * @description: 注册Mapper的代理Bean
-     * @date: 2020/4/24 21:06
-     * @param: [beanDefinitionRegistry, datasourceId, packages, lazyInitialization]
-     * 类注册, 数据源标识, 扫描包名, 懒加载配置
-     * @return: void 响应参数
-     */
-    private void registerMapperBeanDefinition(BeanDefinitionRegistry beanDefinitionRegistry, String datasourceId, List<String> packages, String lazyInitialization)
-    {
-        ClassPathMapperScanner scanner = new ClassPathMapperScanner(beanDefinitionRegistry);
-        scanner.setAddToConfig(true);
-        scanner.setAnnotationClass(Mapper.class);
-        scanner.setSqlSessionFactoryBeanName(SQL_SESSION_FACTORY_BEAN_NAME + StringUtil.upperFirst(datasourceId));
-        scanner.setSqlSessionTemplateBeanName(SQL_SESSION_TEMPLATE_BEAN_NAME + StringUtil.upperFirst(datasourceId));
-        scanner.setResourceLoader(applicationContext);
-        scanner.setBeanNameGenerator(null);
-        scanner.setMapperFactoryBeanClass(null);
-        if (StringUtils.hasText(lazyInitialization))
-        {
-            scanner.setLazyInitialization(Boolean.parseBoolean(lazyInitialization));
-        }
-
-        scanner.registerFilters();
-        String[] packageNames = new String[packages.size()];
-        packages.toArray(packageNames);
-        scanner.scan(packageNames);
     }
 
     /**
@@ -149,16 +122,17 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         DruidDataSource druidDataSource = new DruidDataSource();
         Properties properties = SpringUtil.getPropertiesByPrefix(applicationContext.getEnvironment(), CUSTOM_DATASOURCE_PREFIX + datasourceId);
         // 将属性的key中的中划线-转为小驼峰式, 如druid.test-while-idle转为如druid.testWhileIdle
-        properties.stringPropertyNames().forEach(propertyNames -> properties.setProperty(StringUtil.strikeToLittleCamelCase(propertyNames), properties.getProperty(propertyNames)));
+        properties.stringPropertyNames().forEach(propertyNames ->
+                properties.setProperty(StringUtil.strikeToLittleCamelCase(propertyNames), properties.getProperty(propertyNames)));
         druidDataSource.configFromPropety(properties);
         annotatedBeanDefinition.getPropertyValues().addPropertyValue("dataSource", druidDataSource);
 
         // 指定*Mapper.xml目录
-        String mapperFolder = applicationContext.getEnvironment().getProperty(CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis.mapper.locations");
+        String mapperFolder = applicationContext.getEnvironment().getProperty(String.format(CUSTOM_DATASOURCE_MYBATIS_MAPPER_LOCATIONS, CUSTOM_DATASOURCE_PREFIX, datasourceId));
         if (StringUtils.isEmpty(mapperFolder))
         {
             LOGGER.info("*Mapper.xml资源地址配置项为空, 根据默认地址获取*Mapper.xml资源");
-            mapperFolder = "classpath:mapper/" + datasourceId + "/*.xml";
+            mapperFolder = String.format(DEFAULT_MAPPER_XML_CLASSPATH, datasourceId);
         }
         try
         {
@@ -176,7 +150,7 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
 
     /**
      * @author: Ares
-     * @description: 注册额外数据源的mybatis配置
+     * @description: 注册自定义数据源的mybatis配置
      * @date: 2020/4/24 21:05
      * @param: [beanDefinitionRegistry, datasourceId] 请求参数
      * @return: void 响应参数
@@ -201,13 +175,14 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         builder.addPropertyValue("annotationClass", Mapper.class);
         builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(packages));
         BeanWrapper beanWrapper = new BeanWrapperImpl(MapperScannerConfigurer.class);
-        Stream.of(beanWrapper.getPropertyDescriptors()).filter((x) -> "lazyInitialization".equals(x.getName())).findAny().ifPresent((x) -> builder.addPropertyValue("lazyInitialization", "${" + CUSTOM_DATASOURCE_PREFIX + datasourceId + ".mybatis.lazy-initialization:false}"));
+        Stream.of(beanWrapper.getPropertyDescriptors())
+                .filter((x) -> "lazyInitialization".equals(x.getName()))
+                .findAny()
+                .ifPresent((x) ->
+                        builder.addPropertyValue("lazyInitialization", String.format(CUSTOM_DATASOURCE_MYBATIS_LAZY_INITIALIZATION, CUSTOM_DATASOURCE_PREFIX, datasourceId)));
 
         builder.addPropertyValue("sqlSessionFactoryBeanName", SQL_SESSION_FACTORY_BEAN_NAME + StringUtil.upperFirst(datasourceId));
         builder.addPropertyValue("sqlSessionTemplateBeanName", SQL_SESSION_TEMPLATE_BEAN_NAME + StringUtil.upperFirst(datasourceId));
-
-        // 注册Mapper的代理Bean
-        registerMapperBeanDefinition(registry, datasourceId, packages, String.valueOf(builder.getBeanDefinition().getPropertyValues().getPropertyValue("lazyInitialization")));
 
         registry.registerBeanDefinition(MapperScannerConfigurer.class.getName() + StringUtil.upperFirst(datasourceId), builder.getBeanDefinition());
     }

@@ -1,7 +1,7 @@
 package com.asiainfo.strategy.business.impl;
 
 import com.asiainfo.strategy.business.TestProvider;
-import com.asiainfo.strategy.mapper.TestMapper;
+import com.asiainfo.strategy.mapper.original.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

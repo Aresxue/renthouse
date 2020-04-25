@@ -17,6 +17,30 @@ public class MultipleDataSourceConstants
      */
     public static final String CUSTOM_DATASOURCE_PREFIX = "custom.datasource.";
     /**
+     * @author: Ares
+     * @description: 自定义数据源*Mapper.xml地址配置项格式
+     * @date: 2020/4/25 18:47
+     * @param:  请求参数
+     * @return:  响应参数
+     */
+    public static final String CUSTOM_DATASOURCE_MYBATIS_MAPPER_LOCATIONS = "%s%s.mybatis.mapper.locations";
+    /**
+     * @author: Ares
+     * @description: 自定义数据源mybatis懒加载配置
+     * @date: 2020/4/25 18:56
+     * @param:  请求参数
+     * @return:  响应参数
+     */
+    public static final String CUSTOM_DATASOURCE_MYBATIS_LAZY_INITIALIZATION = "${%s%s.mybatis.lazy-initialization:false}";
+    /**
+     * @author: Ares
+     * @description: 自定义数据源默认*Mapper.xml地址格式, 字符串参数为数据源标识
+     * @date: 2020/4/25 18:45
+     * @param:  请求参数
+     * @return:  响应参数
+     */
+    public static final String DEFAULT_MAPPER_XML_CLASSPATH = "classpath:mapper/%s/*.xml";
+    /**
      * 自定义数据源配置信息分隔符
      */
     public static final String CUSTOM_DATASOURCE_DELIMITER = ",";

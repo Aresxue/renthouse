@@ -1,6 +1,7 @@
 package com.asiainfo.strategy;
 
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class})
+@MapperScan(basePackages = {"com.asiainfo.strategy.mapper.original"})
 public class SharingStrategyImplApplication
 {
 

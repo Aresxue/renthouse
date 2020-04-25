@@ -1,4 +1,4 @@
-package com.asiainfo.strategy.mapper;
+package com.asiainfo.strategy.mapper.original;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
