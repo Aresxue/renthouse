@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -59,11 +60,11 @@ import java.util.concurrent.TimeUnit;
  * 请求由连接池维护
  * @version: JDK 1.8
  */
+@Component
 public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
 
-    @Autowired
     private static HttpConnectionPoolConfig config;
 
     /**
@@ -446,52 +447,58 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
         // 如果自动注入失败那么手动注入
         if (null == config)
         {
-            config = (HttpConnectionPoolConfig) SpringUtil.getBean(HttpConnectionPoolConfig.class);
+            config = SpringUtil.getBean(HttpConnectionPoolConfig.class);
+        }
+    }
+
+    @Autowired
+    public static void setConfig(HttpConnectionPoolConfig config)
+    {
+        HttpClientUtil.config = config;
+    }
+
+    public static class MonitorHttpWorker implements Runnable
+    {
+        private final HttpConnectionPoolConfig config;
+
+        private final PoolingHttpClientConnectionManager manager;
+
+        /**
+         * 线程名称
+         */
+        private final String threadName;
+
+        MonitorHttpWorker(PoolingHttpClientConnectionManager manager, HttpConnectionPoolConfig config)
+        {
+            super();
+            this.manager = manager;
+            this.config = config;
+            this.threadName = config.getMonitorThreadName();
+        }
+
+        public String getThreadName()
+        {
+            return threadName;
+        }
+
+        /**
+         * @author: Ares
+         * @description: Http连接监控
+         * 关闭异常和空闲连接
+         * @date: 2019/8/17 9:39
+         * @param: [] 请求参数
+         * @return: void 响应参数
+         */
+        @Override
+        public void run()
+        {
+            // 关闭异常连接
+            manager.closeExpiredConnections();
+            // 关闭空闲的连接
+            manager.closeIdleConnections(config.getHttpIdleTimeOut(), TimeUnit.MILLISECONDS);
+            LOGGER.info("关闭异常或空闲{}ms以上的连接", config.getHttpIdleTimeOut());
         }
     }
 }
 
-class MonitorHttpWorker implements Runnable
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(MonitorHttpWorker.class);
 
-    private HttpConnectionPoolConfig config;
-
-    private PoolingHttpClientConnectionManager manager;
-
-    /**
-     * 线程名称
-     */
-    private String threadName;
-
-    MonitorHttpWorker(PoolingHttpClientConnectionManager manager, HttpConnectionPoolConfig config)
-    {
-        super();
-        this.manager = manager;
-        this.config = config;
-        this.threadName = config.getMonitorThreadName();
-    }
-
-    public String getThreadName()
-    {
-        return threadName;
-    }
-
-    /**
-     * @author: Ares
-     * @description: Http连接监控
-     * 关闭异常和空闲连接
-     * @date: 2019/8/17 9:39
-     * @param: [] 请求参数
-     * @return: void 响应参数
-     */
-    @Override
-    public void run()
-    {
-        // 关闭异常连接
-        manager.closeExpiredConnections();
-        // 关闭空闲的连接
-        manager.closeIdleConnections(config.getHttpIdleTimeOut(), TimeUnit.MILLISECONDS);
-        LOGGER.info("关闭异常或空闲{}ms以上的连接", config.getHttpIdleTimeOut());
-    }
-}

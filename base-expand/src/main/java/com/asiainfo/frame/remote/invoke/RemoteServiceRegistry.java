@@ -38,19 +38,19 @@ import java.util.List;
 @Configuration
 public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcessor
 {
-    private static final Logger logger = LoggerFactory.getLogger(RemoteServiceRegistry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteServiceRegistry.class);
 
-    private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
+    private final ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
     private static final String JSON_FILE_NAME = "remote-service.json";
 
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException
+    public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException
     {
         URL url = ClassLoader.getSystemResource(JSON_FILE_NAME);
         if (null == url)
         {
-            logger.info("远程调用配置文件[{}]不存在,不再生成代理服务并注册", JSON_FILE_NAME);
+            LOGGER.info("远程调用配置文件[{}]不存在,不再生成代理服务并注册", JSON_FILE_NAME);
             return;
         }
 
@@ -62,7 +62,7 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
             serviceList = mapper.readValue(new File(url.getPath()), javaType);
         } catch (IOException e)
         {
-            logger.error("读取远程调用配置文件[{}]并转为远程代理服务时出错: ", JSON_FILE_NAME, e);
+            LOGGER.error("读取远程调用配置文件[{}]并转为远程代理服务时出错: ", JSON_FILE_NAME, e);
         }
 
         List<String> filterList = new ArrayList<>();
@@ -76,7 +76,7 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
                     // 如果该bean已经加载过则不再加载
                     continue;
                 }
-                logger.info("开始生成远程代理服务并注册,服务bean: {}", beanUnique);
+                LOGGER.info("开始生成远程代理服务并注册,服务bean: {}", beanUnique);
                 Class<?> clazz;
                 try
                 {
@@ -85,7 +85,7 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
                     RemoteInfc remoteInfc = clazz.getAnnotation(RemoteInfc.class);
                     if (null == remoteInfc)
                     {
-                        logger.error("当前服务不是远程接口,请为{}加上RemoteInfc注解", beanUnique);
+                        LOGGER.error("当前服务不是远程接口,请为{}加上RemoteInfc注解", beanUnique);
                         continue;
                     }
 
@@ -93,7 +93,7 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
                     CommonController.addServiceId(service.getServiceId(), method);
                 } catch (ClassNotFoundException | NoSuchMethodException e)
                 {
-                    logger.error("加载class或method时失败,请检查远程调用配置文件[{}]: ", JSON_FILE_NAME, e);
+                    LOGGER.error("加载class或method时失败,请检查远程调用配置文件[{}]: ", JSON_FILE_NAME, e);
                     continue;
                 }
 
@@ -101,7 +101,6 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
 
                 ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(annotatedBeanDefinition);
                 annotatedBeanDefinition.setScope(scopeMetadata.getScopeName());
-
                 annotatedBeanDefinition.setAutowireCandidate(true);
                 annotatedBeanDefinition.getPropertyValues().addPropertyValue("remoteInfcClass", clazz);
                 annotatedBeanDefinition.getPropertyValues().addPropertyValue("serviceCenter", service.getServiceCenter());
@@ -110,7 +109,7 @@ public class RemoteServiceRegistry implements BeanDefinitionRegistryPostProcesso
                 BeanDefinitionHolder beanDefinitionHolder = new BeanDefinitionHolder(annotatedBeanDefinition, beanName, new String[]{service.getServiceId()});
                 BeanDefinitionReaderUtils.registerBeanDefinition(beanDefinitionHolder, beanDefinitionRegistry);
                 filterList.add(beanUnique);
-                logger.info("生成远程代理服务并注册成功,服务bean: {}", beanUnique);
+                LOGGER.info("生成远程代理服务并注册成功,服务bean: {}", beanUnique);
             }
         }
     }
