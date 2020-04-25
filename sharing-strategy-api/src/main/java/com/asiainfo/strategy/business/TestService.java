@@ -8,25 +8,5 @@ package com.asiainfo.strategy.business;
  */
 public interface TestService
 {
-    /**
-     * @author: Ares
-     * @description: 动态数据源测试
-     * @date: 2020/3/24 10:06
-     * @param: [] 请求参数
-     * @return: int 响应参数
-     */
-    void testDynamicDataSource();
 
-    /**
-     * @author: Ares
-     * @description: 测试插入
-     * @date: 2020/3/26 10:14
-     * @param: [] 请求参数
-     * @return: int 响应参数
-     */
-    void testInsertPayment();
-
-    void testDynamicDataSourceTransactional();
-
-    void testDynamicDataSourceTransactionalUseMethod();
 }

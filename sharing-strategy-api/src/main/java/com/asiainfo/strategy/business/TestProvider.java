@@ -8,7 +8,5 @@ package com.asiainfo.strategy.business;
  */
 public interface TestProvider
 {
-    void selectPaymentId(String datasourceId);
 
-    void testInsertPayment();
 }

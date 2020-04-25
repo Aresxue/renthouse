@@ -3,7 +3,6 @@ package com.asiainfo.strategy;
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Import;
 
@@ -19,10 +18,8 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.function.impl",
         "com.asiainfo.strategy.business.impl",
         "com.asiainfo.strategy.config",
-        "com.asiainfo.strategy.multiple.datasources",
         "com.asiainfo.strategy.mapper",
-        "com.asiainfo.strategy.aop"},
-        exclude = DataSourceAutoConfiguration.class)
+        "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class})
 public class SharingStrategyImplApplication

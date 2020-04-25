@@ -3,13 +3,6 @@ server:
 spring:
   application:
     name: sharing-strategy-impl
-  #  jta:
-  #    atomikos:
-  #      properties:
-  #        max-actives: 50
-  #        max-timeout: 300000
-  #        default-jta-timeout: 10000
-  #        enable-logging: true
 eureka:
   instance:
     hostname: 127.0.0.1
