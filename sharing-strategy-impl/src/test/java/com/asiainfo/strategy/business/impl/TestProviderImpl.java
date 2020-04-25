@@ -1,7 +1,8 @@
 package com.asiainfo.strategy.business.impl;
 
 import com.asiainfo.strategy.business.TestProvider;
-import com.asiainfo.strategy.mapper.original.TestMapper;
+import com.asiainfo.strategy.mapper.TestMapper;
+import com.asiainfo.strategy.mapper.datasourceOne.TestMapperOne;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class TestProviderImpl implements TestProvider
     @Autowired
     private TestMapper testMapper;
 
+    @Autowired
+    private TestMapperOne testMapperOne;
+
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void selectPaymentId(String datasourceId)
@@ -40,7 +44,8 @@ public class TestProviderImpl implements TestProvider
     {
         for (int i = 0; i < 100; i++)
         {
-            testMapper.testInsertPayment(i);
+//            testMapper.testInsertPayment(i);
+            testMapperOne.testInsertPayment(i);
         }
 //        throw new RuntimeException();
     }

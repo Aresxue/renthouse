@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.asiainfo.strategy.mapper.datasourceOne.TestMapperOne">
+    <insert id="testInsertPayment">
+        INSERT INTO payment_202003 (payment_id, operated_payment_serial_nbr, acct_id, prod_inst_id, acc_num,
+                                    operation_type, amount, deposit_amount, payment_method, payment_channel_id,
+                                    staff_id, org_id, payment_date, inv_offer, region_id, pay_cycle_id, business_rec_id,
+                                    status_cd, status_date, create_date, route_id)
+        VALUES (#{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value}, #{value},
+                #{value}, #{value}, now(), #{value}, #{value}, #{value}, #{value}, #{value}, now(), now(), #{value})
+    </insert>
 
     <select id="testDynamicDataSource" resultType="java.lang.Integer">
         select payment_id from payment_202003 limit 1

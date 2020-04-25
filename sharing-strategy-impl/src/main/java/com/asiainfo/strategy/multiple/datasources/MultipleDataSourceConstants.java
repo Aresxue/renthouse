@@ -33,6 +33,10 @@ public class MultipleDataSourceConstants
      */
     public static final String CUSTOM_DATASOURCE_MYBATIS_LAZY_INITIALIZATION = "${%s%s.mybatis.lazy-initialization:false}";
     /**
+     * 自定义数据源mybatis扫描包目录配置
+     */
+    public static final String CUSTOM_DATASOURCE_MYBATIS_BASE_PACKAGES = "%s%s.mybatis.basePackages";
+    /**
      * @author: Ares
      * @description: 自定义数据源默认*Mapper.xml地址格式, 字符串参数为数据源标识
      * @date: 2020/4/25 18:45

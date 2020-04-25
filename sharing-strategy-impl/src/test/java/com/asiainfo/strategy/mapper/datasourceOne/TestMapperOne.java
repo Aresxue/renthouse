@@ -1,6 +1,7 @@
 package com.asiainfo.strategy.mapper.datasourceOne;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -21,4 +22,6 @@ public interface TestMapperOne
      * @return: int 响应参数
      */
     int testDynamicDataSource();
+
+    int testInsertPayment(@Param("value") int value);
 }
