@@ -148,14 +148,16 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
             }
         }
 
-        try
-        {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource[] mapperLocations = resolver.getResources(mapperFolder);
-            annotatedBeanDefinition.getPropertyValues().addPropertyValue("mapperLocations", mapperLocations);
-        } catch (IOException e)
-        {
-            LOGGER.error("获取*Mapper.xml资源失败: ", e);
+        if(!StringUtils.isEmpty(mapperFolder)){
+            try
+            {
+                ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+                Resource[] mapperLocations = resolver.getResources(mapperFolder);
+                annotatedBeanDefinition.getPropertyValues().addPropertyValue("mapperLocations", mapperLocations);
+            } catch (IOException e)
+            {
+                LOGGER.error("获取*Mapper.xml资源失败: ", e);
+            }
         }
 
         // 将属性的key中的中划线-转为小驼峰式, 如druid.test-while-idle转为如druid.testWhileIdle
@@ -166,6 +168,7 @@ public class MybatisConfigurationRegistry implements BeanDefinitionRegistryPostP
         // 分布式事务Atomikos数据源
         AtomikosDataSourceBean atomikosDataSource = new AtomikosDataSourceBean();
         atomikosDataSource.setXaDataSource(druidDataSource);
+        atomikosDataSource.setUniqueResourceName(StringUtils.isEmpty(datasourceId)?"default":datasourceId);
         annotatedBeanDefinition.getPropertyValues().addPropertyValue("dataSource", atomikosDataSource);
 
         BeanDefinitionHolder beanDefinitionHolder = new BeanDefinitionHolder(annotatedBeanDefinition, SQL_SESSION_FACTORY_BEAN_NAME + StringUtil.upperFirst(datasourceId));
