@@ -179,7 +179,7 @@ public class CommonController
      * @description: 参数处理
      * @date: 2019/6/15 16:59
      * @Param: [requestType, value, flag]
-     * 请求Class,值,json操作标识
+     * 请求Class, 请求值, json操作标识
      * @return: java.lang.Object 响应参数
      */
     private Object paramHandle(Class<?> requestType, Object value, MutableBoolean flag)
@@ -223,16 +223,16 @@ public class CommonController
                     }
                     else
                     {
-                        Class<?> clazz = Class.forName(requestType.getName());
-                        Method valueOfMethod = clazz.getMethod("valueOf", String.class);
+                        Method valueOfMethod = requestType.getMethod("valueOf", String.class);
                         return valueOfMethod.invoke(null, value.toString());
                     }
-                } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException | InvocationTargetException e)
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
-            }// 字符串
+            }
+            // 字符串
             else if (String.class.isAssignableFrom(requestType))
             {
                 String tempValue = String.valueOf(value);
@@ -269,7 +269,6 @@ public class CommonController
             {
                 try
                 {
-                    Class<?> clazz = Class.forName(requestType.getName());
                     String str;
                     if (flag.booleanValue())
                     {
@@ -279,33 +278,29 @@ public class CommonController
                     {
                         str = value.toString();
                     }
-                    Object object = OBJECT_MAPPER.readValue(str, clazz);
+                    Map params = OBJECT_MAPPER.readValue(str, Map.class);
                     flag.setValue(true);
-                    Method method = clazz.getMethod("entrySet");
-                    Set<Map.Entry> entrySet = (Set<Map.Entry>) method.invoke(object);
 
                     Map map;
-                    if (clazz.isInterface())
+                    if (requestType.isInterface())
                     {
                         // 默认实现类选取HashMap
                         map = new HashMap<>();
                     }
                     else
                     {
-                        map = (Map) clazz.newInstance();
+                        map = (Map) requestType.newInstance();
                     }
-                    for (Map.Entry entry : entrySet)
-                    {
-                        Object key = entry.getKey();
-                        Object tempValue = entry.getValue();
-                        map.put(null == key ? null : paramHandle(key.getClass(), key, flag), null == tempValue ? null : paramHandle(tempValue.getClass(), tempValue, flag));
-                    }
+
+                    params.forEach((k, v) -> {
+                        map.put(null == k ? null : paramHandle(k.getClass(), k, flag), null == v ? null : paramHandle(v.getClass(), v, flag));
+                    });
                     return map;
                 } catch (IOException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
-                } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e)
+                } catch (InstantiationException | IllegalAccessException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
@@ -315,7 +310,6 @@ public class CommonController
             {
                 try
                 {
-                    Class<?> clazz = Class.forName(requestType.getName());
                     String str;
                     if (flag.booleanValue())
                     {
@@ -327,8 +321,8 @@ public class CommonController
                     }
                     Collection valueCollection = OBJECT_MAPPER.readValue(str, Collection.class);
                     flag.setValue(true);
-                    Collection collection;
 
+                    Collection collection;
                     if (requestType.isInterface() && List.class.isAssignableFrom(requestType))
                     {
                         collection = new ArrayList<>();
@@ -339,18 +333,18 @@ public class CommonController
                     }
                     else
                     {
-                        collection = (Collection) clazz.newInstance();
+                        collection = (Collection) requestType.newInstance();
                     }
-                    for (Object element : valueCollection)
-                    {
+
+                    valueCollection.forEach(element -> {
                         collection.add(null == element ? null : paramHandle(element.getClass(), element, flag));
-                    }
+                    });
                     return collection;
                 } catch (IOException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
-                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e)
+                } catch (InstantiationException | IllegalAccessException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
@@ -360,20 +354,14 @@ public class CommonController
             {
                 try
                 {
-                    Class<?> clazz = Class.forName(requestType.getName());
-                    return OBJECT_MAPPER.readValue(value.toString(), clazz);
+                    return OBJECT_MAPPER.readValue(value.toString(), requestType);
                 } catch (IOException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
-                } catch (ClassNotFoundException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
             }
         }
         return null;
     }
-
 }

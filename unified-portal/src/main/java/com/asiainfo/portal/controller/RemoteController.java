@@ -4,6 +4,7 @@ import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,7 @@ public class RemoteController
 
 
     @RequestMapping("/test")
-    public ResponseBase test(RequestBase request)
+    public ResponseBase test(@RequestBody RequestBase request)
     {
         return sharingStrategyFuncService.sharingStrategy(request);
     }
