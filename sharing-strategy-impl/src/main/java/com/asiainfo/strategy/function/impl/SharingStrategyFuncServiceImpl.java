@@ -66,4 +66,13 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
         response.setResponseEnum(ResponseEnum.SUCCESS);
         return response;
     }
+
+    @Override
+    public ResponseBase sharingStrategy(Integer i)
+    {
+        LOGGER.info(i.toString());
+        ResponseBase response = new ResponseBase();
+        response.setResponseEnum(ResponseEnum.SUCCESS);
+        return response;
+    }
 }

@@ -42,6 +42,8 @@ public class RemoteController
         tempMap.put(request.getUserName(),request.getPassword());
         List list = new ArrayList();
         list.add(tempMap);
-        return sharingStrategyFuncService.sharingStrategy(list);
+//        return sharingStrategyFuncService.sharingStrategy(list);
+
+        return sharingStrategyFuncService.sharingStrategy(1);
     }
 }

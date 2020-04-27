@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -55,12 +58,18 @@ public class CommonController
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonController.class);
 
     private static final ObjectMapper OBJECT_MAPPER;
+    /**
+     * public方法的Lookup
+     */
+    private static final MethodHandles.Lookup PUBLIC_LOOKUP;
 
     static
     {
         OBJECT_MAPPER = new ObjectMapper();
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         OBJECT_MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+
+        PUBLIC_LOOKUP = MethodHandles.publicLookup();
     }
 
     /**
@@ -223,14 +232,16 @@ public class CommonController
                 else if (ClassTypeUtil.isBaseWrap(requestType))
                 {
                     // 对Character做特殊处理
-                    if (requestType.getName().contains("Character"))
+                    if (Character.class.getName().equals(requestType.getName()))
                     {
                         return value.toString().charAt(1);
                     }
                     else
                     {
-                        Method valueOfMethod = requestType.getMethod("valueOf", String.class);
-                        return valueOfMethod.invoke(null, value.toString());
+                        // 使用方法句柄进行转换
+                        MethodType methodType = MethodType.methodType(requestType, String.class);
+                        MethodHandle valueOfHandle = PUBLIC_LOOKUP.findStatic(requestType, "valueOf", methodType);
+                        return valueOfHandle.invoke(value.toString());
                     }
                 }
                 // 字符串
@@ -290,7 +301,7 @@ public class CommonController
         {
             LOGGER.error("{}: ", INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
             throw new RemoteInvokeException(INVOKE_FAILURE_JSON_PARSE);
-        } catch (Exception e)
+        } catch (Throwable e)
         {
             LOGGER.error("{}: ", UNKNOWN_EXCEPTION.getResponseDesc(), e);
             throw new RemoteInvokeException(UNKNOWN_EXCEPTION);
