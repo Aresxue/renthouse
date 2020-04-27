@@ -15,20 +15,25 @@ public enum ResponseEnum implements ResponseEnumInfc
     /**
      * 1开头远程调用失败
      */
-    INVOKE_FAILURE("1000", "远程调用失败"), INVOKE_FAILURE_NOT_FOUND_SERVICE("1001", "在当前实例找不到对应的服务,请检查调用服务是否配置RemoteService注解"), INVOKE_FAILURE_MORE_THAN_ONE("1002", "发现多个同版本服务实现,请指定不同版本或修改接口"), INVOKE_FAILURE_JSON_PARSE("1003", "解析Json参数失败"), INVOKE_FAILURE_DATE_ERROR("1004", "该参数为字符串而不是日期"), INVOKE_FAILURE_DEAL_PACKAGE("1005", "处理包装类数据发生异常"),
+    INVOKE_FAILURE("1000", "远程调用失败"),
+    INVOKE_FAILURE_NOT_FOUND_SERVICE("1001", "在当前实例找不到对应的服务,请检查调用服务是否配置RemoteService注解"),
+    INVOKE_FAILURE_MORE_THAN_ONE("1002", "发现多个同版本服务实现,请指定不同版本或修改接口"),
+    INVOKE_FAILURE_JSON_PARSE("1003", "解析Json参数失败"),
+    INVOKE_FAILURE_DATE_ERROR("1004", "该参数为字符串而不是日期"), INVOKE_FAILURE_DEAL_PACKAGE("1005", "处理包装类数据发生异常"),
     /**
      * 9代表未知错误
      */
-    UNKNOWN_ERROR("9000", "未知错误"), UNKNOWN_EXCEPTION("9001", "未知异常");
+    UNKNOWN_ERROR("9000", "未知错误"),
+    UNKNOWN_EXCEPTION("9001", "未知异常");
 
     /**
      * 响应码
      */
-    private String responseCode;
+    private final String responseCode;
     /**
      * 响应描述
      */
-    private String responseDesc;
+    private final String responseDesc;
 
     ResponseEnum(String responseCode, String responseDesc)
     {

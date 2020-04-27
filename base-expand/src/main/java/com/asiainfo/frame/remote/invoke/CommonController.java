@@ -8,9 +8,10 @@ import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
 import com.asiainfo.frame.utils.SpringUtil;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang.mutable.MutableBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,17 +25,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author: Ares
@@ -154,14 +154,14 @@ public class CommonController
         try
         {
             Class<?>[] paramTypes = method.getParameterTypes();
+            Type[] paramTypeList = service.getProxyMethod().getGenericParameterTypes();
 
             Object[] params = new Object[paramTypes.length];
             // 参数处理
             for (int i = 0; i < paramTypes.length; i++)
             {
                 Object value = parameters.getFirst("arg" + i);
-                MutableBoolean flag = new MutableBoolean(false);
-                params[i] = paramHandle(paramTypes[i], value, flag);
+                params[i] = paramHandle(paramTypes[i], value, paramTypeList[i]);
             }
 
             return method.invoke(service.getProxyService(), params);
@@ -178,11 +178,11 @@ public class CommonController
      * @author: Ares
      * @description: 参数处理
      * @date: 2019/6/15 16:59
-     * @Param: [requestType, value, flag]
-     * 请求Class, 请求值, json操作标识
+     * @Param: [requestType, value, paramType]
+     * 请求Class, 请求值, 参数类型
      * @return: java.lang.Object 响应参数
      */
-    private Object paramHandle(Class<?> requestType, Object value, MutableBoolean flag)
+    private Object paramHandle(Class<?> requestType, Object value, Type paramType) throws RemoteInvokeException
     {
         if (value != null)
         {
@@ -267,87 +267,57 @@ public class CommonController
             // Map
             else if (Map.class.isAssignableFrom(requestType))
             {
-                try
-                {
-                    String str;
-                    if (flag.booleanValue())
-                    {
-                        str = OBJECT_MAPPER.writeValueAsString(value);
-                    }
-                    else
-                    {
-                        str = value.toString();
-                    }
-                    Map params = OBJECT_MAPPER.readValue(str, Map.class);
-                    flag.setValue(true);
-
-                    Map map;
-                    if (requestType.isInterface())
-                    {
-                        // 默认实现类选取HashMap
-                        map = new HashMap<>();
-                    }
-                    else
-                    {
-                        map = (Map) requestType.newInstance();
-                    }
-
-                    params.forEach((k, v) -> {
-                        map.put(null == k ? null : paramHandle(k.getClass(), k, flag), null == v ? null : paramHandle(v.getClass(), v, flag));
-                    });
-                    return map;
-                } catch (IOException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
-                } catch (InstantiationException | IllegalAccessException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
-                }
+                //                try
+                //                {
+                //                    String str;
+                //                    if (flag.booleanValue())
+                //                    {
+                //                        str = OBJECT_MAPPER.writeValueAsString(value);
+                //                    }
+                //                    else
+                //                    {
+                //                        str = value.toString();
+                //                    }
+                //                    Map params = OBJECT_MAPPER.readValue(str, Map.class);
+                //                    flag.setValue(true);
+                //
+                //                    Map map;
+                //                    if (requestType.isInterface())
+                //                    {
+                //                        // 默认实现类选取HashMap
+                //                        map = new HashMap<>();
+                //                    }
+                //                    else
+                //                    {
+                //                        map = (Map) requestType.newInstance();
+                //                    }
+                //
+                //                    params.forEach((k, v) -> {
+                //                        map.put(null == k ? null : paramHandle(k.getClass(), k, flag), null == v ? null : paramHandle(v.getClass(), v, flag));
+                //                    });
+                //                    return map;
             }// 集合
             else if (Collection.class.isAssignableFrom(requestType))
             {
                 try
                 {
-                    String str;
-                    if (flag.booleanValue())
+                    if (paramType instanceof ParameterizedType)
                     {
-                        str = OBJECT_MAPPER.writeValueAsString(value);
+                        JavaType javaType = buildCollectionType(requestType, (ParameterizedType) paramType);
+                        return OBJECT_MAPPER.readValue(value.toString(), javaType);
                     }
                     else
                     {
-                        str = value.toString();
+                        return OBJECT_MAPPER.readValue(value.toString(), requestType);
                     }
-                    Collection valueCollection = OBJECT_MAPPER.readValue(str, Collection.class);
-                    flag.setValue(true);
-
-                    Collection collection;
-                    if (requestType.isInterface() && List.class.isAssignableFrom(requestType))
-                    {
-                        collection = new ArrayList<>();
-                    }
-                    else if (requestType.isInterface() && Set.class.isAssignableFrom(requestType))
-                    {
-                        collection = new HashSet<>();
-                    }
-                    else
-                    {
-                        collection = (Collection) requestType.newInstance();
-                    }
-
-                    valueCollection.forEach(element -> {
-                        collection.add(null == element ? null : paramHandle(element.getClass(), element, flag));
-                    });
-                    return collection;
-                } catch (IOException e)
+                } catch (JsonProcessingException e)
                 {
                     LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
                     throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
-                } catch (InstantiationException | IllegalAccessException e)
+                } catch (ClassNotFoundException e)
                 {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
+                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
+                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
                 }
             }
             else
@@ -363,5 +333,27 @@ public class CommonController
             }
         }
         return null;
+    }
+
+    /**
+     * @author: Ares
+     * @description: 构建集合泛型
+     * @date: 2020/4/27 10:34
+     * @param: [requestType, paramType]
+     * 请求类型, 参数类型
+     * @return: com.fasterxml.jackson.databind.JavaType 响应参数
+     */
+    private JavaType buildCollectionType(Class<?> requestType, ParameterizedType paramType) throws ClassNotFoundException
+    {
+        Type[] types = paramType.getActualTypeArguments();
+        Class<?> clz;
+        if (!(types[0] instanceof ParameterizedType))
+        {
+            clz = Class.forName(types[0].getTypeName());
+            return OBJECT_MAPPER.getTypeFactory().constructParametricType(requestType, clz);
+        }
+        ParameterizedType type =  (ParameterizedType)types[0];
+        clz = Class.forName(type.getOwnerType().getTypeName());
+        return buildCollectionType(clz, type);
     }
 }

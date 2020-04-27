@@ -8,9 +8,8 @@ import com.asiainfo.frame.base.ResponseEnum;
  * @description: 远程调用自定义异常
  * @version: JDK 1.8
  */
-public class RemoteInvokeException extends RuntimeException
+public class RemoteInvokeException extends Exception
 {
-    private static final long serialVersionUID = -2038262924659942460L;
     /**
      * 响应码
      */
@@ -26,12 +25,14 @@ public class RemoteInvokeException extends RuntimeException
 
     public RemoteInvokeException(ResponseEnum responseEnum)
     {
+        super(responseEnum.getResponseCode() + ":" + responseEnum.getResponseDesc());
         this.errCode = responseEnum.getResponseCode();
         this.errMsg = responseEnum.getResponseDesc();
     }
 
     public RemoteInvokeException(String errCode, String errMsg)
     {
+        super(errCode + ":" + errCode);
         this.errCode = errCode;
         this.errMsg = errMsg;
     }

@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author: Ares
  * @date: 2019/6/17 10:19
@@ -21,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncService
 {
-    private static final Logger logger = LoggerFactory.getLogger(SharingStrategyFuncServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyFuncServiceImpl.class);
 
     @Autowired
     private SharingStrategyBusService sharingStrategyBusService;
@@ -36,7 +39,16 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
     @Override
     public ResponseBase sharingStrategy(RequestBase request)
     {
-        logger.info("调用功能服务");
+        LOGGER.info("调用功能服务");
+        ResponseBase response = new ResponseBase();
+        response.setResponseEnum(ResponseEnum.SUCCESS);
+        return response;
+    }
+
+    @Override
+    public ResponseBase sharingStrategy(Collection<List<RequestBase>> request)
+    {
+        request.forEach(list->list.forEach(i-> LOGGER.info(i.getUserName()+":"+i.getPassword())));
         ResponseBase response = new ResponseBase();
         response.setResponseEnum(ResponseEnum.SUCCESS);
         return response;

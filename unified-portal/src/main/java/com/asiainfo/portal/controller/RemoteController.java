@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author: Ares
  * @date: 2019/6/17 10:53
@@ -25,6 +28,11 @@ public class RemoteController
     @RequestMapping("/test")
     public ResponseBase test(@RequestBody RequestBase request)
     {
-        return sharingStrategyFuncService.sharingStrategy(request);
+        List list = new ArrayList();
+        List<RequestBase> temp = new ArrayList<>();
+        temp.add(request);
+        list.add(temp);
+//        return sharingStrategyFuncService.sharingStrategy(request);
+        return sharingStrategyFuncService.sharingStrategy(list);
     }
 }
