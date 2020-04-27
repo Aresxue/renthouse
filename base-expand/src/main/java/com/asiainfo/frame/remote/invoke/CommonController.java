@@ -2,7 +2,6 @@ package com.asiainfo.frame.remote.invoke;
 
 
 import com.asiainfo.frame.base.ResponseBase;
-import com.asiainfo.frame.base.ResponseEnum;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -35,6 +33,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_DATE_ERROR;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_JSON_PARSE;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE;
+import static com.asiainfo.frame.base.ResponseEnum.UNKNOWN_ERROR;
+import static com.asiainfo.frame.base.ResponseEnum.UNKNOWN_EXCEPTION;
 
 /**
  * @author: Ares
@@ -110,9 +116,9 @@ public class CommonController
             return method.invoke(bean, requestParam);
         } catch (Exception e)
         {
-            LOGGER.error("{}: ", ResponseEnum.UNKNOWN_ERROR.getResponseDesc(), e);
+            LOGGER.error("{}: ", UNKNOWN_ERROR.getResponseDesc(), e);
             ResponseBase response = new ResponseBase();
-            response.setResponseEnum(ResponseEnum.UNKNOWN_ERROR);
+            response.setResponseEnum(UNKNOWN_ERROR);
             return response;
         }
     }
@@ -131,21 +137,21 @@ public class CommonController
         List<RemoteProxyService> proxyServices = REMOTE_PROXY_SERVICE.get(Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString());
         if (null == proxyServices)
         {
-            LOGGER.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
+            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
+            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
         if (proxyServices.size() > 1)
         {
-            LOGGER.error(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE.getResponseDesc());
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE);
+            LOGGER.error(INVOKE_FAILURE_MORE_THAN_ONE.getResponseDesc());
+            response.setResponseEnum(INVOKE_FAILURE_MORE_THAN_ONE);
             return response;
         }
         RemoteProxyService service = proxyServices.get(0);
         if (null == service || null == service.getProxyService() || null == service.getProxyMethod())
         {
-            LOGGER.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
+            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
+            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
         Method method = service.getProxyMethod();
@@ -167,8 +173,8 @@ public class CommonController
             return method.invoke(service.getProxyService(), params);
         } catch (Exception e)
         {
-            LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE);
+            LOGGER.error("{}: ", INVOKE_FAILURE.getResponseDesc(), e);
+            response.setResponseEnum(INVOKE_FAILURE);
         }
         return response;
     }
@@ -184,37 +190,37 @@ public class CommonController
      */
     private Object paramHandle(Class<?> requestType, Object value, Type paramType) throws RemoteInvokeException
     {
-        if (value != null)
+        try
         {
-            // 如果是基础类型,基本类型不会为null,否则编译器会报错
-            if (requestType.isPrimitive())
+            if (value != null)
             {
-                switch (requestType.getName())
+                // 如果是基础类型,基本类型不会为null,否则编译器会报错
+                if (requestType.isPrimitive())
                 {
-                    case "int":
-                        return Integer.valueOf(value.toString());
-                    case "double":
-                        return Double.valueOf(value.toString());
-                    case "float":
-                        return Float.valueOf(value.toString());
-                    case "long":
-                        return Long.valueOf(value.toString());
-                    case "char":
-                        return value.toString().charAt(1);
-                    case "byte":
-                        return Byte.valueOf(value.toString());
-                    case "short":
-                        return Short.valueOf(value.toString());
-                    case "boolean":
-                        return Boolean.valueOf(value.toString());
-                    default:
-                        break;
+                    switch (requestType.getName())
+                    {
+                        case "int":
+                            return Integer.valueOf(value.toString());
+                        case "double":
+                            return Double.valueOf(value.toString());
+                        case "float":
+                            return Float.valueOf(value.toString());
+                        case "long":
+                            return Long.valueOf(value.toString());
+                        case "char":
+                            return value.toString().charAt(1);
+                        case "byte":
+                            return Byte.valueOf(value.toString());
+                        case "short":
+                            return Short.valueOf(value.toString());
+                        case "boolean":
+                            return Boolean.valueOf(value.toString());
+                        default:
+                            break;
+                    }
                 }
-            }
-            // 基础类型包装类
-            else if (ClassTypeUtil.isBaseWrap(requestType))
-            {
-                try
+                // 基础类型包装类
+                else if (ClassTypeUtil.isBaseWrap(requestType))
                 {
                     // 对Character做特殊处理
                     if (requestType.getName().contains("Character"))
@@ -226,134 +232,110 @@ public class CommonController
                         Method valueOfMethod = requestType.getMethod("valueOf", String.class);
                         return valueOfMethod.invoke(null, value.toString());
                     }
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE);
                 }
-            }
-            // 字符串
-            else if (String.class.isAssignableFrom(requestType))
-            {
-                String tempValue = String.valueOf(value);
-                // 泛型擦除中Date类型会丢失,这里采用一种比较简单粗暴的方法处理
-                if (tempValue.contains(DateUtil.T_VALUE) && tempValue.contains(DateUtil.TIME_SUFFIX))
+                // 字符串
+                else if (String.class.isAssignableFrom(requestType))
                 {
-                    try
+                    String tempValue = String.valueOf(value);
+                    // 泛型擦除中Date类型会丢失,这里采用一种比较简单粗暴的方法处理
+                    if (tempValue.contains(DateUtil.T_VALUE) && tempValue.contains(DateUtil.TIME_SUFFIX))
                     {
-                        return DateUtil.parse(tempValue);
-                    } catch (Exception e)
-                    {
-                        LOGGER.warn("{}: {}", ResponseEnum.INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), tempValue);
+                        try
+                        {
+                            return DateUtil.parse(tempValue);
+                        } catch (Exception e)
+                        {
+                            LOGGER.warn("{}: {}", INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), tempValue);
+                        }
                     }
+                    return tempValue;
                 }
-                return tempValue;
-            }
-            else if (Date.class.isAssignableFrom(requestType))
-            {
-                try
+                else if (Date.class.isAssignableFrom(requestType))
                 {
                     return DateUtil.parse(value.toString().replaceAll("\"", ""));
-                } catch (ParseException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_DATE_ERROR);
                 }
-            }
-            else if (LocalDateTime.class.isAssignableFrom(requestType))
-            {
-                return LocalDateTime.parse(value.toString().replaceAll("\"", ""));
-            }
-            // Map
-            else if (Map.class.isAssignableFrom(requestType))
-            {
-                //                try
-                //                {
-                //                    String str;
-                //                    if (flag.booleanValue())
-                //                    {
-                //                        str = OBJECT_MAPPER.writeValueAsString(value);
-                //                    }
-                //                    else
-                //                    {
-                //                        str = value.toString();
-                //                    }
-                //                    Map params = OBJECT_MAPPER.readValue(str, Map.class);
-                //                    flag.setValue(true);
-                //
-                //                    Map map;
-                //                    if (requestType.isInterface())
-                //                    {
-                //                        // 默认实现类选取HashMap
-                //                        map = new HashMap<>();
-                //                    }
-                //                    else
-                //                    {
-                //                        map = (Map) requestType.newInstance();
-                //                    }
-                //
-                //                    params.forEach((k, v) -> {
-                //                        map.put(null == k ? null : paramHandle(k.getClass(), k, flag), null == v ? null : paramHandle(v.getClass(), v, flag));
-                //                    });
-                //                    return map;
-            }// 集合
-            else if (Collection.class.isAssignableFrom(requestType))
-            {
-                try
+                else if (LocalDateTime.class.isAssignableFrom(requestType))
                 {
-                    if (paramType instanceof ParameterizedType)
-                    {
-                        JavaType javaType = buildCollectionType(requestType, (ParameterizedType) paramType);
-                        return OBJECT_MAPPER.readValue(value.toString(), javaType);
-                    }
-                    else
-                    {
-                        return OBJECT_MAPPER.readValue(value.toString(), requestType);
-                    }
-                } catch (JsonProcessingException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
-                } catch (ClassNotFoundException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
+                    return LocalDateTime.parse(value.toString().replaceAll("\"", ""));
                 }
-            }
-            else
-            {
-                try
+                // Map
+                else if (Map.class.isAssignableFrom(requestType))
+                {
+                    return OBJECT_MAPPER.readValue(value.toString(), buildJavaType(requestType, paramType));
+                }
+                // 集合
+                else if (Collection.class.isAssignableFrom(requestType))
+                {
+                    // 对待集合类接口, 默认使用List模式
+                    if (Collection.class.getName().equals(requestType.getName()))
+                    {
+                        requestType = List.class;
+                    }
+                    return OBJECT_MAPPER.readValue(value.toString(), buildJavaType(requestType, paramType));
+                }
+                else
                 {
                     return OBJECT_MAPPER.readValue(value.toString(), requestType);
-                } catch (IOException e)
-                {
-                    LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
-                    throw new RemoteInvokeException(ResponseEnum.INVOKE_FAILURE_JSON_PARSE);
                 }
             }
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e)
+        {
+            LOGGER.error("{}: ", INVOKE_FAILURE.getResponseDesc(), e);
+            throw new RemoteInvokeException(INVOKE_FAILURE);
+        } catch (ParseException e)
+        {
+            LOGGER.error("{}: ", INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), e);
+            throw new RemoteInvokeException(INVOKE_FAILURE_DATE_ERROR);
+        } catch (JsonProcessingException e)
+        {
+            LOGGER.error("{}: ", INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
+            throw new RemoteInvokeException(INVOKE_FAILURE_JSON_PARSE);
+        } catch (Exception e)
+        {
+            LOGGER.error("{}: ", UNKNOWN_EXCEPTION.getResponseDesc(), e);
+            throw new RemoteInvokeException(UNKNOWN_EXCEPTION);
         }
+
         return null;
     }
 
     /**
      * @author: Ares
-     * @description: 构建集合泛型
+     * @description: 构建泛型
      * @date: 2020/4/27 10:34
      * @param: [requestType, paramType]
      * 请求类型, 参数类型
      * @return: com.fasterxml.jackson.databind.JavaType 响应参数
      */
-    private JavaType buildCollectionType(Class<?> requestType, ParameterizedType paramType) throws ClassNotFoundException
+    private JavaType buildJavaType(Class<?> requestType, Type paramType) throws ClassNotFoundException
     {
-        Type[] types = paramType.getActualTypeArguments();
-        Class<?> clz;
-        if (!(types[0] instanceof ParameterizedType))
+        if (!(paramType instanceof ParameterizedType))
         {
-            clz = Class.forName(types[0].getTypeName());
+            Class<?> clz = Class.forName(paramType.getTypeName());
             return OBJECT_MAPPER.getTypeFactory().constructParametricType(requestType, clz);
         }
-        ParameterizedType type =  (ParameterizedType)types[0];
-        clz = Class.forName(type.getOwnerType().getTypeName());
-        return buildCollectionType(clz, type);
+
+        ParameterizedType parameterizedType = (ParameterizedType) paramType;
+        Type[] types = parameterizedType.getActualTypeArguments();
+        JavaType[] javaTypes = new JavaType[types.length];
+
+        for (int i = 0; i < types.length; i++)
+        {
+            JavaType javaType;
+            if (types[i] instanceof ParameterizedType)
+            {
+                ParameterizedType kType = (ParameterizedType) types[i];
+                Class<?> vRawClass = Class.forName(kType.getRawType().getTypeName());
+                javaType = buildJavaType(vRawClass, kType);
+            }
+            else
+            {
+                Class<?> kClass = Class.forName(types[i].getTypeName());
+                javaType = OBJECT_MAPPER.getTypeFactory().constructType(kClass);
+            }
+            javaTypes[i] = javaType;
+        }
+
+        return OBJECT_MAPPER.getTypeFactory().constructParametricType(requestType, javaTypes);
     }
 }

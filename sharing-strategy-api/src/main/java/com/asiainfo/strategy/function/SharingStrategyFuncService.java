@@ -5,8 +5,8 @@ import com.asiainfo.frame.annotations.RemoteInfc;
 import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Ares
@@ -26,9 +26,7 @@ public interface SharingStrategyFuncService
      */
     ResponseBase sharingStrategy(RequestBase request);
 
-    ResponseBase sharingStrategy(Collection<List<RequestBase>> request);
+    ResponseBase sharingStrategy(Map<String, List<RequestBase>> request);
+    ResponseBase sharingStrategy(List<Map<String, String>> request);
 
-//    ResponseBase sharingStrategy(List request);
-//
-//    ResponseBase sharingStrategy(Set request);
 }

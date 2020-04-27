@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Ares
@@ -46,9 +46,22 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
     }
 
     @Override
-    public ResponseBase sharingStrategy(Collection<List<RequestBase>> request)
+    public ResponseBase sharingStrategy(Map<String, List<RequestBase>> request)
     {
-        request.forEach(list->list.forEach(i-> LOGGER.info(i.getUserName()+":"+i.getPassword())));
+        request.forEach((k, list) -> list.forEach(i -> LOGGER.info(i.getUserName() + ":" + i.getPassword())));
+        ResponseBase response = new ResponseBase();
+        response.setResponseEnum(ResponseEnum.SUCCESS);
+        return response;
+    }
+
+    @Override
+    public ResponseBase sharingStrategy(List<Map<String, String>> request)
+    {
+        request.forEach(i -> {
+            i.forEach((k, v) -> {
+                LOGGER.info(k + ":" + v);
+            });
+        });
         ResponseBase response = new ResponseBase();
         response.setResponseEnum(ResponseEnum.SUCCESS);
         return response;

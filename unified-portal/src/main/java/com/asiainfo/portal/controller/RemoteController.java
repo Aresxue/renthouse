@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Ares
@@ -28,11 +30,18 @@ public class RemoteController
     @RequestMapping("/test")
     public ResponseBase test(@RequestBody RequestBase request)
     {
-        List list = new ArrayList();
+        //        return sharingStrategyFuncService.sharingStrategy(request);
+
+        Map map = new HashMap();
         List<RequestBase> temp = new ArrayList<>();
         temp.add(request);
-        list.add(temp);
-//        return sharingStrategyFuncService.sharingStrategy(request);
+        map.put("happy", temp);
+//        return sharingStrategyFuncService.sharingStrategy(map);
+
+        Map tempMap = new HashMap<>();
+        tempMap.put(request.getUserName(),request.getPassword());
+        List list = new ArrayList();
+        list.add(tempMap);
         return sharingStrategyFuncService.sharingStrategy(list);
     }
 }

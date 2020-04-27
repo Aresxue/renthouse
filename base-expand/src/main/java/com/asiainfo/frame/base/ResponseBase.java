@@ -17,6 +17,16 @@ public class ResponseBase
      */
     private String responseDesc;
 
+    public ResponseBase()
+    {
+    }
+
+    public ResponseBase(ResponseEnum responseEnum)
+    {
+        this.responseCode = responseEnum.getResponseCode();
+        this.responseDesc = responseEnum.getResponseDesc();
+    }
+
     public String getResponseCode()
     {
         return responseCode;
