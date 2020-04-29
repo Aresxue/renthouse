@@ -2,21 +2,37 @@ package com.asiainfo.frame.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
  * @author: Ares
- * @date: 2019/6/1 16:00
- * @description: 远程服务实现注解
+ * @date: 2020/04/28 16:00
+ * @description: 服务提供者注解
  * @version: JDK 1.8
  */
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RemoteService
+@Inherited
+public @interface AresProvider
 {
-    String version() default "1.0.0";
+    /**
+     * 服务中心名
+     */
+    String center();
+
+    /**
+     * 服务组别
+     */
+    String group();
+
+    /**
+     * 服务版本
+     */
+    String version();
+
 }

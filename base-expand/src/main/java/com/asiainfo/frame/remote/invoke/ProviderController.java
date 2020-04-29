@@ -1,11 +1,9 @@
 package com.asiainfo.frame.remote.invoke;
 
-
 import com.asiainfo.frame.base.ResponseBase;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
-import com.asiainfo.frame.utils.SpringUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -13,14 +11,13 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -32,36 +29,49 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE;
 import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_DATE_ERROR;
 import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_JSON_PARSE;
 import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE;
-import static com.asiainfo.frame.base.ResponseEnum.UNKNOWN_ERROR;
-import static com.asiainfo.frame.base.ResponseEnum.UNKNOWN_EXCEPTION;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_CLASS;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD;
+import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_METHOD;
+import static com.asiainfo.frame.base.ResponseEnum.UNKNOWN_THROWABLE;
 
 /**
  * @author: Ares
- * @date: 2019/5/31 16:40
- * @description: 公共请求入口
+ * @date: 2020/4/28 15:31
+ * @description: 请求入口
  * @version: JDK 1.8
  */
 @RestController
-@RequestMapping(value = "/common")
-public class CommonController
+@RequestMapping(value = "/provider")
+public class ProviderController
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProviderController.class);
 
-    private static final ObjectMapper OBJECT_MAPPER;
-    /**
-     * public方法的Lookup
+    /***
+     * 提供者的方法句柄
      */
-    private static final MethodHandles.Lookup PUBLIC_LOOKUP;
+    private static final MultiValueMap<String, MethodHandle> PROVIDER_METHOD_HANDLES;
+
+    /**
+     * 提供者实现bean
+     */
+    private static final MultiValueMap<String, Object> PROVIDER_SERVICE = new LinkedMultiValueMap<>();
+    /**
+     * 所有方法的Lookup
+     */
+    private static final MethodHandles.Lookup LOOKUP;
+    /**
+     * json处理器
+     */
+    private static final ObjectMapper OBJECT_MAPPER;
 
     static
     {
@@ -69,125 +79,108 @@ public class CommonController
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         OBJECT_MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
-        PUBLIC_LOOKUP = MethodHandles.publicLookup();
+        PROVIDER_METHOD_HANDLES = new LinkedMultiValueMap<>();
+
+        LOOKUP = MethodHandles.lookup();
     }
 
-    /**
-     * 远程代理方法Map
-     */
-    private static final MultiValueMap<String, RemoteProxyService> REMOTE_PROXY_SERVICE = new LinkedMultiValueMap<>();
-
-    /**
-     * 统一服务调用Map
-     */
-    private static final Map<String, Method> UNIFIED_SERVICE_MAP = new HashMap<>();
 
     /**
      * @author: Ares
-     * @description: 添加代理方法
-     * @date: 2019/6/13 10:59
-     * @Param: [uniqueKey, service] 请求参数
+     * @description: 添加方法句柄
+     * @date: 2020/4/28 15:36
+     * @param: [uniqueKeyEncrypt, methodHandle]
+     * 唯一标识, 方法句柄
      * @return: void 响应参数
      */
-    public static void addProxyMethod(String uniqueKey, RemoteProxyService proxyService)
+    public static void addMethodHandle(String uniqueKey, MethodHandle methodHandle)
     {
-        REMOTE_PROXY_SERVICE.add(uniqueKey, proxyService);
+        PROVIDER_METHOD_HANDLES.add(uniqueKey, methodHandle);
     }
 
     /**
      * @author: Ares
-     * @description: 添加统一调用服务
-     * @date: 2019/6/17 15:47
-     * @Param: [service, uniqueKey] 请求参数
-     * @return: void 响应参数
+     * @description: 获取方法句柄
+     * @date: 2020/4/28 16:29
+     * @param: [beanClass, method, uniqueKey] 请求参数
+     * @return: java.lang.invoke.MethodHandle 响应参数
      */
-    public static void addServiceId(String service, Method method)
+    public static MethodHandle getMethodHandle(Class<?> beanClass, Method method, StringJoiner uniqueKey)
     {
-        UNIFIED_SERVICE_MAP.put(service, method);
-    }
-
-    /**
-     * @author: Ares
-     * @description: 统一调用地址
-     * @date: 2019/6/10 20:21
-     * @Param: [request] 请求参数
-     * @return: java.lang.Object 响应参数
-     */
-    @RequestMapping(value = "/invoke")
-    public Object invoke(HttpServletRequest request, @RequestBody String requestObject)
-    {
+        MethodType methodType = MethodType.methodType(method.getReturnType(), method.getParameterTypes());
+        MethodHandle methodHandle = null;
         try
         {
-            String serviceId = request.getParameter("serviceId");
-            Method method = UNIFIED_SERVICE_MAP.get(serviceId);
-            Object bean = SpringUtil.getBean(serviceId);
-            Object requestParam = OBJECT_MAPPER.readValue(requestObject, method.getParameterTypes()[0]);
-            return method.invoke(bean, requestParam);
-        } catch (Exception e)
+            // 这里改成接口试试, 我觉得会报错
+            methodHandle = LOOKUP.findVirtual(beanClass, method.getName(), methodType);
+        } catch (NoSuchMethodException | IllegalAccessException e)
         {
-            LOGGER.error("{}: ", UNKNOWN_ERROR.getResponseDesc(), e);
-            ResponseBase response = new ResponseBase();
-            response.setResponseEnum(UNKNOWN_ERROR);
-            return response;
+            LOGGER.error("获取实例方法:{}时发生异常: ", uniqueKey, e);
         }
+        return methodHandle;
     }
 
-    /**
-     * @author: Ares
-     * @description: 内部实例互相调用
-     * @date: 2019/6/10 20:22
-     * @Param: [request] 请求参数
-     * @return: java.lang.Object 响应参数
-     **/
     @RequestMapping(value = "/innerInvoke")
     public Object innerInvoke(@RequestParam(required = false) MultiValueMap<String, Object> parameters)
     {
         ResponseBase response = new ResponseBase();
-        List<RemoteProxyService> proxyServices = REMOTE_PROXY_SERVICE.get(Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString());
-        if (null == proxyServices)
+        String uniqueKey = Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString();
+        List<MethodHandle> methodHandles = PROVIDER_METHOD_HANDLES.get(uniqueKey);
+        if (CollectionUtils.isEmpty(methodHandles))
         {
-            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
-            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_SERVICE);
+            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_METHOD.getLoggerDesc(), uniqueKey);
+            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_METHOD);
             return response;
         }
-        if (proxyServices.size() > 1)
+        if (methodHandles.size() > 1)
         {
-            LOGGER.error(INVOKE_FAILURE_MORE_THAN_ONE.getResponseDesc());
+            LOGGER.error(INVOKE_FAILURE_MORE_THAN_ONE.getLoggerDesc(), uniqueKey);
             response.setResponseEnum(INVOKE_FAILURE_MORE_THAN_ONE);
             return response;
         }
-        RemoteProxyService service = proxyServices.get(0);
-        if (null == service || null == service.getProxyService() || null == service.getProxyMethod())
-        {
-            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
-            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_SERVICE);
-            return response;
-        }
-        Method method = service.getProxyMethod();
-        // 可以省略,为了预防权限问题这里设置一下
-        method.setAccessible(true);
+        MethodHandle methodHandle = methodHandles.get(0);
+
+        String[] strings = uniqueKey.split("#");
+
         try
         {
-            Class<?>[] paramTypes = method.getParameterTypes();
-            Type[] paramTypeList = service.getProxyMethod().getGenericParameterTypes();
+            Class<?> interfaceClass = Class.forName(strings[0]);
 
-            Object[] params = new Object[paramTypes.length];
-            // 参数处理
+            String[] paramTypes = strings[4].split(",");
+            Class<?>[] parameterTypes = new Class<?>[paramTypes.length];
             for (int i = 0; i < paramTypes.length; i++)
             {
-                Object value = parameters.getFirst("arg" + i);
-                params[i] = paramHandle(paramTypes[i], value, paramTypeList[i]);
+                parameterTypes[i] = Class.forName(paramTypes[i]);
             }
 
-            return method.invoke(service.getProxyService(), params);
-        } catch (Exception e)
+            Method method = interfaceClass.getDeclaredMethod(strings[1], parameterTypes);
+            Type[] paramTypeList = method.getGenericParameterTypes();
+            // 参数处理
+            Object[] params = new Object[paramTypeList.length];
+            for (int i = 0; i < parameterTypes.length; i++)
+            {
+                params[i] = paramHandle(parameterTypes[i], parameters.getFirst("arg" + i), paramTypeList[i]);
+            }
+            return methodHandle.invoke(params);
+        } catch (ClassNotFoundException e)
         {
-            LOGGER.error("{}: ", INVOKE_FAILURE.getResponseDesc(), e);
-            response.setResponseEnum(INVOKE_FAILURE);
+            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_CLASS.getLoggerDesc(), strings[0], e);
+            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_CLASS);
+        } catch (NoSuchMethodException e)
+        {
+            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD.getLoggerDesc(), strings[1], e);
+            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD);
+        } catch (RemoteInvokeException ex)
+        {
+            response.setRemoteInvokeException(ex);
+        } catch (Throwable e)
+        {
+            LOGGER.error(UNKNOWN_THROWABLE.getLoggerDesc(), e);
+            response.setResponseEnum(UNKNOWN_THROWABLE);
         }
+
         return response;
     }
-
 
     /**
      * @author: Ares
@@ -197,7 +190,7 @@ public class CommonController
      * 请求Class, 请求值, 参数类型
      * @return: java.lang.Object 响应参数
      */
-    private Object paramHandle(Class<?> requestType, Object value, Type paramType) throws RemoteInvokeException
+    private Object paramHandle(Class<?> requestType, Object value, Type paramType) throws Throwable
     {
         try
         {
@@ -240,7 +233,7 @@ public class CommonController
                     {
                         // 使用方法句柄进行转换
                         MethodType methodType = MethodType.methodType(requestType, String.class);
-                        MethodHandle valueOfHandle = PUBLIC_LOOKUP.findStatic(requestType, "valueOf", methodType);
+                        MethodHandle valueOfHandle = LOOKUP.findStatic(requestType, "valueOf", methodType);
                         return valueOfHandle.invoke(value.toString());
                     }
                 }
@@ -291,20 +284,16 @@ public class CommonController
             }
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e)
         {
-            LOGGER.error("{}: ", INVOKE_FAILURE.getResponseDesc(), e);
+            LOGGER.error(INVOKE_FAILURE.getResponseDesc(), e);
             throw new RemoteInvokeException(INVOKE_FAILURE);
         } catch (ParseException e)
         {
-            LOGGER.error("{}: ", INVOKE_FAILURE_DATE_ERROR.getResponseDesc(), e);
+            LOGGER.error(INVOKE_FAILURE_DATE_ERROR.getLoggerDesc(), value, e);
             throw new RemoteInvokeException(INVOKE_FAILURE_DATE_ERROR);
         } catch (JsonProcessingException e)
         {
-            LOGGER.error("{}: ", INVOKE_FAILURE_JSON_PARSE.getResponseDesc(), e);
+            LOGGER.error(INVOKE_FAILURE_JSON_PARSE.getLoggerDesc(), value, e);
             throw new RemoteInvokeException(INVOKE_FAILURE_JSON_PARSE);
-        } catch (Throwable e)
-        {
-            LOGGER.error("{}: ", UNKNOWN_EXCEPTION.getResponseDesc(), e);
-            throw new RemoteInvokeException(UNKNOWN_EXCEPTION);
         }
 
         return null;

@@ -1,6 +1,6 @@
 package com.asiainfo.strategy.function.impl;
 
-import com.asiainfo.frame.annotations.RemoteService;
+import com.asiainfo.frame.annotations.AresProvider;
 import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 import com.asiainfo.frame.base.ResponseEnum;
@@ -20,8 +20,8 @@ import java.util.Map;
  * @description: 合租攻略实现
  * @version: JDK 1.8
  */
-@RemoteService
 @Service
+@AresProvider(center = "sharing-strategy-impl", group = "ares", version = "1.0.0")
 public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyFuncServiceImpl.class);
@@ -57,11 +57,7 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
     @Override
     public ResponseBase sharingStrategy(List<Map<String, String>> request)
     {
-        request.forEach(i -> {
-            i.forEach((k, v) -> {
-                LOGGER.info(k + ":" + v);
-            });
-        });
+        request.forEach(i -> i.forEach((k, v) -> LOGGER.info(k + ":" + v)));
         ResponseBase response = new ResponseBase();
         response.setResponseEnum(ResponseEnum.SUCCESS);
         return response;

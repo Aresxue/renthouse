@@ -1,24 +1,28 @@
 package com.asiainfo.frame.annotations;
 
+import org.springframework.context.annotation.Import;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
  * @author: Ares
- * @date: 2019/6/1 16:01
- * @description: 远程服务接口注解
+ * @date: 2020/4/28 13:25
+ * @description: 扫描服务注解
  * @version: JDK 1.8
  */
-
-@Inherited
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RemoteInfc
+@Import({AresComponentScanRegistrar.class})
+public @interface AresComponentScan
 {
-    String version() default "1.0.0";
+    String[] value() default {};
+
+    String[] basePackages() default {};
+
+    Class<?>[] basePackageClasses() default {};
 }

@@ -1,5 +1,6 @@
 package com.asiainfo.strategy;
 
+import com.asiainfo.frame.annotations.AresComponentScan;
 import com.asiainfo.strategy.config.HttpConnectionPoolConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
         "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class})
+@AresComponentScan(basePackages = "com.asiainfo.strategy.function.impl")
 public class SharingStrategyImplApplication
 {
 

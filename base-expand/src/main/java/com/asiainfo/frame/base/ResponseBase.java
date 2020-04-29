@@ -1,5 +1,7 @@
 package com.asiainfo.frame.base;
 
+import com.asiainfo.frame.exceptions.RemoteInvokeException;
+
 /**
  * @author: Ares
  * @date: 2019/6/11 17:39
@@ -51,6 +53,12 @@ public class ResponseBase
     {
         this.responseCode = responseEnum.getResponseCode();
         this.responseDesc = responseEnum.getResponseDesc();
+    }
+
+    public void setRemoteInvokeException(RemoteInvokeException exception)
+    {
+        this.responseCode = exception.getErrCode();
+        this.responseDesc = exception.getErrMsg();
     }
 
     @Override

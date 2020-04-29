@@ -1,7 +1,6 @@
 package com.asiainfo.strategy.function;
 
 
-import com.asiainfo.frame.annotations.RemoteInfc;
 import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 
@@ -14,7 +13,6 @@ import java.util.Map;
  * @description: 合租攻略接口
  * @version: JDK 1.8
  */
-@RemoteInfc
 public interface SharingStrategyFuncService
 {
     /**

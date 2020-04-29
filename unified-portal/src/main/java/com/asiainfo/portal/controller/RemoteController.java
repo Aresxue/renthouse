@@ -1,9 +1,9 @@
 package com.asiainfo.portal.controller;
 
+import com.asiainfo.frame.annotations.AresConsumer;
 import com.asiainfo.frame.base.RequestBase;
 import com.asiainfo.frame.base.ResponseBase;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +23,9 @@ import java.util.Map;
 @RequestMapping("/remote")
 public class RemoteController
 {
-    @Autowired
-    SharingStrategyFuncService sharingStrategyFuncService;
-
+//    @Autowired
+    @AresConsumer(center = "sharing-strategy-impl", group = "ares", version = "1.0.0")
+    private SharingStrategyFuncService sharingStrategyFuncService;
 
     @RequestMapping("/test")
     public ResponseBase test(@RequestBody RequestBase request)
