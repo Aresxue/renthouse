@@ -1,7 +1,6 @@
 package com.asiainfo.frame.remote.invoke;
 
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
-import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
 import com.asiainfo.frame.utils.SpringUtil;
 import com.asiainfo.frame.vo.ResponseBase;
@@ -19,10 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -30,20 +25,20 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
-import static com.asiainfo.frame.remote.invoke.ProviderAnnotationBeanPostProcessor.buildBeanName;
+import static com.asiainfo.frame.utils.ClassTypeUtil.isBaseWrap;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_DATE_ERROR;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_JSON_PARSE;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_CLASS;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD;
-import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_METHOD;
-import static com.asiainfo.frame.vo.ResponseEnum.UNKNOWN_THROWABLE;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE;
+import static com.asiainfo.frame.vo.ResponseEnum.UNKNOWN_EXCEPTION;
 
 /**
  * @author: Ares
@@ -58,18 +53,10 @@ public class ProviderController
     private static final Logger LOGGER = LoggerFactory.getLogger(ProviderController.class);
 
     /***
-     * 提供者的方法句柄
+     * 提供者的实例
      */
-    private static final MultiValueMap<String, MethodHandle> PROVIDER_METHOD_HANDLES;
+    private static final MultiValueMap<String, Object> SERVICE_BEANS;
 
-    /**
-     * 提供者实现bean
-     */
-    private static final Map<String, Object> PROVIDER_SERVICE = new HashMap<>();
-    /**
-     * 所有方法的Lookup
-     */
-    private static final MethodHandles.Lookup LOOKUP;
     /**
      * json处理器
      */
@@ -81,79 +68,62 @@ public class ProviderController
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         OBJECT_MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
-        PROVIDER_METHOD_HANDLES = new LinkedMultiValueMap<>();
-
-        LOOKUP = MethodHandles.lookup();
+        SERVICE_BEANS = new LinkedMultiValueMap<>();
     }
 
 
     /**
      * @author: Ares
-     * @description: 添加方法句柄
+     * @description: 添加服务实例
      * @date: 2020/4/28 15:36
-     * @param: [uniqueId, methodHandle]
-     * 唯一标识, 方法句柄
+     * @param: [uniqueId, serviceBean]
+     * 唯一标识, 服务实例
      * @return: void 响应参数
      */
-    public static void addMethodHandle(String uniqueId, MethodHandle methodHandle)
+    public static void addServiceBean(String uniqueId, Object serviceBean)
     {
-        PROVIDER_METHOD_HANDLES.add(uniqueId, methodHandle);
-    }
-
-
-    /**
-     * @author: Ares
-     * @description: 获取方法句柄
-     * @date: 2020/4/28 16:29
-     * @param: [beanClass, method, uniqueId] 请求参数
-     * @return: java.lang.invoke.MethodHandle 响应参数
-     */
-    public static MethodHandle getMethodHandle(Class<?> beanClass, Method method, String uniqueId)
-    {
-        MethodType methodType = MethodType.methodType(method.getReturnType(), method.getParameterTypes());
-        MethodHandle methodHandle = null;
-        try
-        {
-            // 这里改成接口试试, 我觉得会报错
-            methodHandle = LOOKUP.findVirtual(beanClass, method.getName(), methodType);
-        } catch (NoSuchMethodException | IllegalAccessException e)
-        {
-            LOGGER.error("获取实例方法:{}时发生异常: ", uniqueId, e);
-        }
-        return methodHandle;
+        SERVICE_BEANS.add(uniqueId, serviceBean);
     }
 
     @RequestMapping(value = "/innerInvoke")
     public Object innerInvoke(@RequestParam(required = false) MultiValueMap<String, Object> parameters)
     {
         ResponseBase response = new ResponseBase();
+
+
         String uniqueKey = Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString();
-        List<MethodHandle> methodHandles = PROVIDER_METHOD_HANDLES.get(uniqueKey);
-        if (CollectionUtils.isEmpty(methodHandles))
+        String[] strings = uniqueKey.split("#");
+        String interfaceName = strings[0];
+        String methodName = strings[1];
+        String group = strings[2];
+        String version = strings[3];
+        String[] paramTypes = strings[4].split(",");
+
+        String beanUnique = generateBeanUnique(interfaceName,group,version);
+        List<Object> serviceBeans = SERVICE_BEANS.get(beanUnique);
+        if (CollectionUtils.isEmpty(serviceBeans))
         {
-            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_METHOD.getLoggerDesc(), uniqueKey);
-            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_METHOD);
+            LOGGER.error(INVOKE_FAILURE_NOT_FOUND_SERVICE.getLoggerDesc(), uniqueKey);
+            response.setResponseEnum(INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
-        if (methodHandles.size() > 1)
+        if (serviceBeans.size() > 1)
         {
             LOGGER.error(INVOKE_FAILURE_MORE_THAN_ONE.getLoggerDesc(), uniqueKey);
             response.setResponseEnum(INVOKE_FAILURE_MORE_THAN_ONE);
             return response;
         }
-        MethodHandle methodHandle = methodHandles.get(0);
 
-        String[] strings = uniqueKey.split("#");
+        Object serviceBean = serviceBeans.get(0);
+        if (null == serviceBean)
+        {
+            serviceBean = SpringUtil.getBean(beanUnique);
+            addServiceBean(beanUnique, serviceBean);
+        }
 
         try
         {
-            String interfaceName = strings[0];
-            String methodName = strings[1];
-            String group = strings[2];
-            String version = strings[3];
             Class<?> interfaceClass = Class.forName(interfaceName);
-
-            String[] paramTypes = strings[4].split(",");
             Class<?>[] parameterTypes = new Class<?>[paramTypes.length];
             for (int i = 0; i < paramTypes.length; i++)
             {
@@ -169,15 +139,7 @@ public class ProviderController
                 params[i] = paramHandle(parameterTypes[i], parameters.getFirst("arg" + i), paramTypeList[i]);
             }
 
-            String beanName = buildBeanName(interfaceName,group,version);
-            Object bean = PROVIDER_SERVICE.get(beanName);
-            if(null == bean){
-                bean = SpringUtil.getBean(beanName);
-                PROVIDER_SERVICE.put(beanName, bean);
-            }
-
-            // 这里不支持这种调用
-            return methodHandle.invoke(bean, params);
+            return method.invoke(serviceBean, params);
         } catch (ClassNotFoundException e)
         {
             LOGGER.error(INVOKE_FAILURE_NOT_FOUND_CLASS.getLoggerDesc(), strings[0], e);
@@ -189,13 +151,31 @@ public class ProviderController
         } catch (RemoteInvokeException ex)
         {
             response.setRemoteInvokeException(ex);
-        } catch (Throwable e)
+        } catch (Exception e)
         {
-            LOGGER.error(UNKNOWN_THROWABLE.getLoggerDesc(), e);
-            response.setResponseEnum(UNKNOWN_THROWABLE);
+            LOGGER.error(UNKNOWN_EXCEPTION.getLoggerDesc(), e);
+            response.setResponseEnum(UNKNOWN_EXCEPTION);
         }
 
         return response;
+    }
+
+
+    /**
+     * @author: Ares
+     * @description: 生成实例唯一标识
+     * @date: 2020/4/30 19:22
+     * @param: [interfaceName, group, version]
+     *
+     * @return: java.lang.String 响应参数
+     */
+    public static String generateBeanUnique(String interfaceName, String group, String version)
+    {
+        StringJoiner stringJoiner = new StringJoiner(":");
+        stringJoiner.add(interfaceName);
+        stringJoiner.add(group);
+        stringJoiner.add(version);
+        return stringJoiner.toString();
     }
 
     /**
@@ -206,51 +186,43 @@ public class ProviderController
      * 请求Class, 请求值, 参数类型
      * @return: java.lang.Object 响应参数
      */
-    private Object paramHandle(Class<?> requestType, Object value, Type paramType) throws Throwable
+    private Object paramHandle(Class<?> requestType, Object value, Type paramType) throws RemoteInvokeException
     {
         try
         {
             if (value != null)
             {
                 // 如果是基础类型,基本类型不会为null,否则编译器会报错
-                if (requestType.isPrimitive())
+                if (isBaseWrap(requestType))
                 {
                     switch (requestType.getName())
                     {
                         case "int":
+                        case "java.lang.Integer":
                             return Integer.valueOf(value.toString());
                         case "double":
+                        case "java.lang.Double":
                             return Double.valueOf(value.toString());
                         case "float":
+                        case "java.lang.Float":
                             return Float.valueOf(value.toString());
                         case "long":
+                        case "java.lang.Long":
                             return Long.valueOf(value.toString());
                         case "char":
+                        case "java.lang.Character":
                             return value.toString().charAt(1);
                         case "byte":
+                        case "java.lang.Byte":
                             return Byte.valueOf(value.toString());
                         case "short":
+                        case "java.lang.Short":
                             return Short.valueOf(value.toString());
                         case "boolean":
+                        case "java.lang.Boolean":
                             return Boolean.valueOf(value.toString());
                         default:
                             break;
-                    }
-                }
-                // 基础类型包装类
-                else if (ClassTypeUtil.isBaseWrap(requestType))
-                {
-                    // 对Character做特殊处理
-                    if (Character.class.getName().equals(requestType.getName()))
-                    {
-                        return value.toString().charAt(1);
-                    }
-                    else
-                    {
-                        // 使用方法句柄进行转换
-                        MethodType methodType = MethodType.methodType(requestType, String.class);
-                        MethodHandle valueOfHandle = LOOKUP.findStatic(requestType, "valueOf", methodType);
-                        return valueOfHandle.invoke(value.toString());
                     }
                 }
                 // 字符串
@@ -298,7 +270,7 @@ public class ProviderController
                     return OBJECT_MAPPER.readValue(value.toString(), requestType);
                 }
             }
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e)
+        } catch (ClassNotFoundException e)
         {
             LOGGER.error(INVOKE_FAILURE.getResponseDesc(), e);
             throw new RemoteInvokeException(INVOKE_FAILURE);
@@ -354,4 +326,5 @@ public class ProviderController
 
         return OBJECT_MAPPER.getTypeFactory().constructParametricType(requestType, javaTypes);
     }
+
 }

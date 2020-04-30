@@ -754,9 +754,9 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                     if (!this.cached)
                     {
                         Class<?> fieldType = field.getType();
-                        String interfaceName = ClassUtils.getShortName(fieldType.getName());
+                        String interfaceName = fieldType.getName();
                         String shortName = ClassUtils.getShortName(interfaceName);
-                        AnnotationAttributes attributes = com.asiainfo.frame.remote.invoke.AnnotationUtils.getMergedAttributes(field, AresConsumer.class, environment, true, new String[0]);
+                        AnnotationAttributes attributes = com.asiainfo.frame.remote.invoke.AnnotationUtils.getMergedAttributes(field, AresConsumer.class, environment, true);
                         ConsumerBeanFactory consumerBeanFactory = new ConsumerBeanFactory();
                         consumerBeanFactory.setCenter(consumerParams.get("center"));
                         consumerBeanFactory.setGroup(consumerParams.get("group"));

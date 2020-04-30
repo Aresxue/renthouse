@@ -3,7 +3,7 @@ package com.asiainfo.portal.controller;
 import com.asiainfo.frame.annotations.AresConsumer;
 import com.asiainfo.frame.vo.RequestBase;
 import com.asiainfo.frame.vo.ResponseBase;
-import com.asiainfo.strategy.function.SharingStrategyFuncService;
+import com.asiainfo.strategy.service.SharingStrategyService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +25,7 @@ public class RemoteController
 {
 //    @Autowired
     @AresConsumer(center = "sharing-strategy-impl", group = "ares", version = "1.0.0")
-    private SharingStrategyFuncService sharingStrategyFuncService;
+    private SharingStrategyService sharingStrategyService;
 
     @RequestMapping("/test")
     public ResponseBase test(@RequestBody RequestBase request)
@@ -44,6 +44,6 @@ public class RemoteController
         list.add(tempMap);
 //        return sharingStrategyFuncService.sharingStrategy(list);
 
-        return sharingStrategyFuncService.sharingStrategy(1);
+        return sharingStrategyService.sharingStrategy(1);
     }
 }

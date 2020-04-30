@@ -29,7 +29,7 @@ sharingStrategyFuncService.sharingStrategy(request);
   {
   
     "serviceId": "100000",
-    "remoteInfcName": "com.asiainfo.strategy.function.SharingStrategyFuncService",
+    "remoteInfcName": "com.asiainfo.strategy.service.SharingStrategyFuncService",
     "serviceCenter": "sharing-strategy-impl",
     "serviceVersion": "1.0.0",
     "methodName": "sharingStrategy",
@@ -38,7 +38,7 @@ sharingStrategyFuncService.sharingStrategy(request);
   
   {
   
-    "remoteInfcName": "com.asiainfo.strategy.function.SharingStrategyFuncService",
+    "remoteInfcName": "com.asiainfo.strategy.service.SharingStrategyFuncService",
     "serviceCenter": "sharing-strategy-impl"
   }
 ]

@@ -1,4 +1,4 @@
-package com.asiainfo.strategy.function;
+package com.asiainfo.strategy.service;
 
 
 import com.asiainfo.frame.vo.RequestBase;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @description: 合租攻略接口
  * @version: JDK 1.8
  */
-public interface SharingStrategyFuncService
+public interface SharingStrategyService
 {
     /**
      * @author: Ares

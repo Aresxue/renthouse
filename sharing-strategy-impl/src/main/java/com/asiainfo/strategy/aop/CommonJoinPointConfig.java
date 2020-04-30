@@ -18,7 +18,7 @@ public class CommonJoinPointConfig
      * @param: 请求参数
      * @return: 响应参数
      */
-    @Pointcut("(execution(* com.asiainfo.strategy.function.impl.*.*(..))) || (execution(* com.asiainfo.strategy.business.impl.*.*(..)))")
+    @Pointcut("(execution(* com.asiainfo.strategy.service.impl.*.*(..))) || (execution(* com.asiainfo.strategy.business.impl.*.*(..)))")
     public void printParamByJson()
     {
     }

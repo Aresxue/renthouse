@@ -4,8 +4,8 @@ import com.asiainfo.frame.annotations.AresProvider;
 import com.asiainfo.frame.vo.RequestBase;
 import com.asiainfo.frame.vo.ResponseBase;
 import com.asiainfo.frame.vo.ResponseEnum;
-import com.asiainfo.strategy.function.SharingStrategyFuncService;
 import com.asiainfo.strategy.module.SharingStrategyModule;
+import com.asiainfo.strategy.service.SharingStrategyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Service
 @AresProvider(group = "ares", version = "1.0.0")
-public class SharingStrategyServiceImpl implements SharingStrategyFuncService
+public class SharingStrategyServiceImpl implements SharingStrategyService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyServiceImpl.class);
 

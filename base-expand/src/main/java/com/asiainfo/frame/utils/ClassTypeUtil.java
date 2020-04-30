@@ -77,7 +77,7 @@ public class ClassTypeUtil
      * @Param: [clazz] Class
      * @return: boolean 响应参数
      */
-    public static boolean isBaseWrap(Class clazz)
+    public static boolean isBaseWrap(Class<?> clazz)
     {
         return isBaseWrap(clazz.getCanonicalName());
     }
@@ -101,7 +101,7 @@ public class ClassTypeUtil
      * @Param: [clazz] Class
      * @return: boolean 响应参数
      */
-    public static boolean isBaseOrWrap(Class clazz)
+    public static boolean isBaseOrWrap(Class<?> clazz)
     {
         return isBaseOrWrap(clazz.getCanonicalName());
     }

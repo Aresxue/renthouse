@@ -28,16 +28,13 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import static com.asiainfo.frame.remote.invoke.ProviderController.addMethodHandle;
-import static com.asiainfo.frame.remote.invoke.ProviderController.getMethodHandle;
+import static com.asiainfo.frame.remote.invoke.ProviderController.addServiceBean;
+import static com.asiainfo.frame.remote.invoke.ProviderController.generateBeanUnique;
 
 /**
  * @author: Ares
@@ -131,41 +128,34 @@ public class ProviderAnnotationBeanPostProcessor implements BeanDefinitionRegist
         String version = serviceAnnotationAttributes.getString("version");
         String interfaceName = interfaceClass.getName();
 
-        String beanName = buildBeanName(interfaceName, group, version);
+        String beanUnique = generateBeanUnique(interfaceName, group, version);
 
         BeanDefinition beanDefinition = beanDefinitionHolder.getBeanDefinition();
-        if (scanner.checkCandidate(beanName, beanDefinition))
+        if (scanner.checkCandidate(beanUnique, beanDefinition))
         {
-            registry.registerBeanDefinition(beanName, beanDefinition);
+            registry.registerBeanDefinition(beanUnique, beanDefinition);
+            addServiceBean(beanUnique, null);
         }
 
-        Method[] methods = interfaceClass.getDeclaredMethods();
-
-
-        for (Method method : methods)
-        {
-            StringJoiner uniqueKey = new StringJoiner("#");
-            uniqueKey.add(interfaceName);
-            uniqueKey.add(method.getName());
-            uniqueKey.add(group);
-            uniqueKey.add(version);
-            String parameterTypes = Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
-            uniqueKey.add(parameterTypes);
-
-            String uniqueId = uniqueKey.toString();
-            MethodHandle methodHandle = getMethodHandle(beanClass, method, uniqueId);
-
-            if (null != methodHandle)
-            {
-                addMethodHandle(uniqueId, methodHandle);
-            }
-        }
+//        Method[] methods = interfaceClass.getDeclaredMethods();
+//        for (Method method : methods)
+//        {
+//            StringJoiner uniqueKey = new StringJoiner("#");
+//            uniqueKey.add(interfaceName);
+//            uniqueKey.add(method.getName());
+//            uniqueKey.add(group);
+//            uniqueKey.add(version);
+//            String parameterTypes = Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
+//            uniqueKey.add(parameterTypes);
+//
+//            String uniqueId = uniqueKey.toString();
+//        }
     }
 
     public static String buildBeanName(String interfaceName, String group, String version)
     {
         StringJoiner stringJoiner = new StringJoiner(":");
-        stringJoiner.add("AresBean");
+        stringJoiner.add("ServiceBean");
         stringJoiner.add(interfaceName);
         stringJoiner.add(group);
         stringJoiner.add(version);
