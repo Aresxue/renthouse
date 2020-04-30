@@ -16,14 +16,15 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication(scanBasePackages = {
         "com.asiainfo.frame",
-        "com.asiainfo.strategy.function.impl",
-        "com.asiainfo.strategy.business.impl",
-        "com.asiainfo.strategy.config",
+        "com.asiainfo.strategy.service.impl",
+        "com.asiainfo.strategy.module",
+        "com.asiainfo.strategy.dao",
         "com.asiainfo.strategy.mapper",
+        "com.asiainfo.strategy.config",
         "com.asiainfo.strategy.aop"})
 @EnableEurekaClient
 @Import({HttpConnectionPoolConfig.class})
-@AresComponentScan(basePackages = "com.asiainfo.strategy.function.impl")
+@AresComponentScan(basePackages = "com.asiainfo.strategy.service.impl")
 public class SharingStrategyImplApplication
 {
 

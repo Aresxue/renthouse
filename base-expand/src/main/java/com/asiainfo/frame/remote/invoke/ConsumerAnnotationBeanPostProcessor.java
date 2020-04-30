@@ -31,25 +31,20 @@ import org.springframework.context.annotation.ScopeMetadataResolver;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.PriorityOrdered;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertyResolver;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -62,7 +57,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -717,119 +711,6 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
         }
     }
 
-    private static class AnnotationUtils
-    {
-        public static <T> T getAttribute(AnnotationAttributes attributes, String name)
-        {
-            return (T) attributes.get(name);
-        }
-
-        public static AnnotationAttributes getMergedAttributes(AnnotatedElement annotatedElement, Class<? extends Annotation> annotationType, PropertyResolver propertyResolver, boolean ignoreDefaultValue, String... ignoreAttributeNames)
-        {
-            Annotation annotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, annotationType);
-            return annotation == null ? null : AnnotationAttributes.fromMap(getAttributes(annotation, propertyResolver, ignoreDefaultValue, ignoreAttributeNames));
-        }
-
-        public static Map<String, Object> getAttributes(Annotation annotation, PropertyResolver propertyResolver, boolean ignoreDefaultValue, String... ignoreAttributeNames)
-        {
-            if (annotation == null)
-            {
-                return Collections.emptyMap();
-            }
-            else
-            {
-                Map<String, Object> attributes = org.springframework.core.annotation.AnnotationUtils.getAnnotationAttributes(annotation);
-                Map<String, Object> actualAttributes = new LinkedHashMap();
-                Iterator var6 = attributes.entrySet().iterator();
-
-                while(true)
-                {
-                    String attributeName;
-                    Object attributeValue;
-                    do
-                    {
-                        do
-                        {
-                            do
-                            {
-                                if (!var6.hasNext())
-                                {
-                                    return resolvePlaceholders(actualAttributes, propertyResolver, ignoreAttributeNames);
-                                }
-
-                                Map.Entry<String, Object> entry = (Map.Entry) var6.next();
-                                attributeName = (String) entry.getKey();
-                                attributeValue = entry.getValue();
-                            } while(ignoreDefaultValue && ObjectUtils.nullSafeEquals(attributeValue, org.springframework.core.annotation.AnnotationUtils.getDefaultValue(annotation, attributeName)));
-                        } while(attributeValue.getClass().isAnnotation());
-                    } while(attributeValue.getClass().isArray() && attributeValue.getClass().getComponentType().isAnnotation());
-
-                    actualAttributes.put(attributeName, attributeValue);
-                }
-            }
-        }
-
-        public static Map<String, Object> resolvePlaceholders(Map<String, Object> sourceAnnotationAttributes, PropertyResolver propertyResolver, String... ignoreAttributeNames)
-        {
-            if (CollectionUtils.isEmpty(sourceAnnotationAttributes))
-            {
-                return Collections.emptyMap();
-            }
-            else
-            {
-                Map<String, Object> resolvedAnnotationAttributes = new LinkedHashMap();
-                Iterator var4 = sourceAnnotationAttributes.entrySet().iterator();
-
-                while(true)
-                {
-                    Map.Entry entry;
-                    String attributeName;
-                    do
-                    {
-                        if (!var4.hasNext())
-                        {
-                            return Collections.unmodifiableMap(resolvedAnnotationAttributes);
-                        }
-
-                        entry = (Map.Entry) var4.next();
-                        attributeName = (String) entry.getKey();
-                    } while(ObjectUtils.containsElement(ignoreAttributeNames, attributeName));
-
-                    Object attributeValue = entry.getValue();
-                    if (attributeValue instanceof String)
-                    {
-                        attributeValue = resolvePlaceholders(String.valueOf(attributeValue), propertyResolver);
-                    }
-                    else if (attributeValue instanceof String[])
-                    {
-                        String[] values = (String[]) ((String[]) attributeValue);
-
-                        for (int i = 0; i < values.length; ++i)
-                        {
-                            values[i] = resolvePlaceholders(values[i], propertyResolver);
-                        }
-
-                        attributeValue = values;
-                    }
-
-                    resolvedAnnotationAttributes.put(attributeName, attributeValue);
-                }
-            }
-        }
-
-        private static String resolvePlaceholders(String attributeValue, PropertyResolver propertyResolver)
-        {
-            String resolvedValue = attributeValue;
-            if (propertyResolver != null)
-            {
-                resolvedValue = propertyResolver.resolvePlaceholders(attributeValue);
-                resolvedValue = StringUtils.trimWhitespace(resolvedValue);
-            }
-
-            return resolvedValue;
-        }
-    }
-
     private class ConsumerFieldElement extends InjectionMetadata.InjectedElement
     {
         private final boolean required;
@@ -875,7 +756,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                         Class<?> fieldType = field.getType();
                         String interfaceName = ClassUtils.getShortName(fieldType.getName());
                         String shortName = ClassUtils.getShortName(interfaceName);
-                        AnnotationAttributes attributes = ConsumerAnnotationBeanPostProcessor.AnnotationUtils.getMergedAttributes(field, AresConsumer.class, environment, true, new String[0]);
+                        AnnotationAttributes attributes = com.asiainfo.frame.remote.invoke.AnnotationUtils.getMergedAttributes(field, AresConsumer.class, environment, true, new String[0]);
                         ConsumerBeanFactory consumerBeanFactory = new ConsumerBeanFactory();
                         consumerBeanFactory.setCenter(consumerParams.get("center"));
                         consumerBeanFactory.setGroup(consumerParams.get("group"));
@@ -901,21 +782,14 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                         value = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class[]{fieldType}, handler);
 
 
-                        if (value == null && !this.required)
+                        this.cachedFieldValue = desc;
+                        ConsumerAnnotationBeanPostProcessor.this.registerDependentBeans(beanName, aresConsumerBeanNames);
+                        if (aresConsumerBeanNames.size() == 1)
                         {
-                            this.cachedFieldValue = null;
-                        }
-                        else
-                        {
-                            this.cachedFieldValue = desc;
-                            ConsumerAnnotationBeanPostProcessor.this.registerDependentBeans(beanName, aresConsumerBeanNames);
-                            if (aresConsumerBeanNames.size() == 1)
+                            String aresConsumerBeanName = (String) aresConsumerBeanNames.iterator().next();
+                            if (ConsumerAnnotationBeanPostProcessor.this.beanFactory.containsBean(aresConsumerBeanName) && ConsumerAnnotationBeanPostProcessor.this.beanFactory.isTypeMatch(aresConsumerBeanName, field.getType()))
                             {
-                                String aresConsumerBeanName = (String) aresConsumerBeanNames.iterator().next();
-                                if (ConsumerAnnotationBeanPostProcessor.this.beanFactory.containsBean(aresConsumerBeanName) && ConsumerAnnotationBeanPostProcessor.this.beanFactory.isTypeMatch(aresConsumerBeanName, field.getType()))
-                                {
-                                    this.cachedFieldValue = new ConsumerAnnotationBeanPostProcessor.ShortcutDependencyDescriptor(desc, aresConsumerBeanName, field.getType());
-                                }
+                                this.cachedFieldValue = new ShortcutDependencyDescriptor(desc, aresConsumerBeanName, field.getType());
                             }
                         }
 
@@ -936,7 +810,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 
     private String getConsumerBeanName(AnnotationAttributes attributes, Class<?> interfaceClass)
     {
-        String beanName = (String) AnnotationUtils.getAttribute(attributes, "id");
+        String beanName = (String) com.asiainfo.frame.remote.invoke.AnnotationUtils.getAttribute(attributes, "id");
         if (!StringUtils.hasText(beanName))
         {
             beanName = this.generateReferenceBeanName(attributes, interfaceClass);

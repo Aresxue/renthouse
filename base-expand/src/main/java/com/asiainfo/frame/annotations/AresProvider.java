@@ -21,11 +21,6 @@ import java.lang.annotation.Target;
 public @interface AresProvider
 {
     /**
-     * 服务中心名
-     */
-    String center();
-
-    /**
      * 服务组别
      */
     String group();

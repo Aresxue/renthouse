@@ -3,6 +3,7 @@ package com.asiainfo.frame.remote.invoke;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
+import com.asiainfo.frame.utils.SpringUtil;
 import com.asiainfo.frame.vo.ResponseBase;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,11 +30,12 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
 
+import static com.asiainfo.frame.remote.invoke.ProviderAnnotationBeanPostProcessor.buildBeanName;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_DATE_ERROR;
 import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_JSON_PARSE;
@@ -63,7 +65,7 @@ public class ProviderController
     /**
      * 提供者实现bean
      */
-    private static final MultiValueMap<String, Object> PROVIDER_SERVICE = new LinkedMultiValueMap<>();
+    private static final Map<String, Object> PROVIDER_SERVICE = new HashMap<>();
     /**
      * 所有方法的Lookup
      */
@@ -89,23 +91,24 @@ public class ProviderController
      * @author: Ares
      * @description: 添加方法句柄
      * @date: 2020/4/28 15:36
-     * @param: [uniqueKeyEncrypt, methodHandle]
+     * @param: [uniqueId, methodHandle]
      * 唯一标识, 方法句柄
      * @return: void 响应参数
      */
-    public static void addMethodHandle(String uniqueKey, MethodHandle methodHandle)
+    public static void addMethodHandle(String uniqueId, MethodHandle methodHandle)
     {
-        PROVIDER_METHOD_HANDLES.add(uniqueKey, methodHandle);
+        PROVIDER_METHOD_HANDLES.add(uniqueId, methodHandle);
     }
+
 
     /**
      * @author: Ares
      * @description: 获取方法句柄
      * @date: 2020/4/28 16:29
-     * @param: [beanClass, method, uniqueKey] 请求参数
+     * @param: [beanClass, method, uniqueId] 请求参数
      * @return: java.lang.invoke.MethodHandle 响应参数
      */
-    public static MethodHandle getMethodHandle(Class<?> beanClass, Method method, StringJoiner uniqueKey)
+    public static MethodHandle getMethodHandle(Class<?> beanClass, Method method, String uniqueId)
     {
         MethodType methodType = MethodType.methodType(method.getReturnType(), method.getParameterTypes());
         MethodHandle methodHandle = null;
@@ -115,7 +118,7 @@ public class ProviderController
             methodHandle = LOOKUP.findVirtual(beanClass, method.getName(), methodType);
         } catch (NoSuchMethodException | IllegalAccessException e)
         {
-            LOGGER.error("获取实例方法:{}时发生异常: ", uniqueKey, e);
+            LOGGER.error("获取实例方法:{}时发生异常: ", uniqueId, e);
         }
         return methodHandle;
     }
@@ -144,7 +147,11 @@ public class ProviderController
 
         try
         {
-            Class<?> interfaceClass = Class.forName(strings[0]);
+            String interfaceName = strings[0];
+            String methodName = strings[1];
+            String group = strings[2];
+            String version = strings[3];
+            Class<?> interfaceClass = Class.forName(interfaceName);
 
             String[] paramTypes = strings[4].split(",");
             Class<?>[] parameterTypes = new Class<?>[paramTypes.length];
@@ -153,7 +160,7 @@ public class ProviderController
                 parameterTypes[i] = Class.forName(paramTypes[i]);
             }
 
-            Method method = interfaceClass.getDeclaredMethod(strings[1], parameterTypes);
+            Method method = interfaceClass.getDeclaredMethod(methodName, parameterTypes);
             Type[] paramTypeList = method.getGenericParameterTypes();
             // 参数处理
             Object[] params = new Object[paramTypeList.length];
@@ -161,7 +168,16 @@ public class ProviderController
             {
                 params[i] = paramHandle(parameterTypes[i], parameters.getFirst("arg" + i), paramTypeList[i]);
             }
-            return methodHandle.invoke(params);
+
+            String beanName = buildBeanName(interfaceName,group,version);
+            Object bean = PROVIDER_SERVICE.get(beanName);
+            if(null == bean){
+                bean = SpringUtil.getBean(beanName);
+                PROVIDER_SERVICE.put(beanName, bean);
+            }
+
+
+            return methodHandle.invoke(bean, params);
         } catch (ClassNotFoundException e)
         {
             LOGGER.error(INVOKE_FAILURE_NOT_FOUND_CLASS.getLoggerDesc(), strings[0], e);

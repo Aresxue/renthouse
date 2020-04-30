@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +25,7 @@ import java.util.Map;
  * @version: JDK 1.8
  */
 @Service
-@AresProvider(center = "sharing-strategy-impl", group = "ares", version = "1.0.0")
+@AresProvider(group = "ares", version = "1.0.0")
 public class SharingStrategyServiceImpl implements SharingStrategyFuncService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyServiceImpl.class);
@@ -70,5 +74,18 @@ public class SharingStrategyServiceImpl implements SharingStrategyFuncService
         ResponseBase response = new ResponseBase();
         response.setResponseEnum(ResponseEnum.SUCCESS);
         return response;
+    }
+
+    public static void main(String[] args) throws Throwable
+    {
+        SharingStrategyServiceImpl s = new SharingStrategyServiceImpl();
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+        MethodType methodType = MethodType.methodType(ResponseBase.class, Integer.class);
+        MethodHandle methodHandle = lookup.findVirtual(SharingStrategyServiceImpl.class, "sharingStrategy", methodType);
+        Object[] params = new Object[1];
+        List list = new ArrayList();
+        list.add(1);
+        params[0] = Integer.valueOf(1);
+        methodHandle.invokeWithArguments(s, 1,2);
     }
 }

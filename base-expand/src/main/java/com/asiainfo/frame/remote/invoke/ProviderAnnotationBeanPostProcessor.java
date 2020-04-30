@@ -81,7 +81,7 @@ public class ProviderAnnotationBeanPostProcessor implements BeanDefinitionRegist
             Set<BeanDefinitionHolder> beanDefinitionHolders = findServiceBeanDefinitionHolders(scanner, packageToScan, registry, beanNameGenerator);
             if (!CollectionUtils.isEmpty(beanDefinitionHolders))
             {
-                beanDefinitionHolders.forEach(this::registerProviderBean);
+                beanDefinitionHolders.forEach(beanDefinitionHolder -> registerProviderBean(beanDefinitionHolder,registry,scanner));
 
                 if (LOGGER.isInfoEnabled())
                 {
@@ -118,39 +118,60 @@ public class ProviderAnnotationBeanPostProcessor implements BeanDefinitionRegist
         return beanNameGenerator;
     }
 
-    private void registerProviderBean(BeanDefinitionHolder beanDefinitionHolder)
+    private void registerProviderBean(BeanDefinitionHolder beanDefinitionHolder, BeanDefinitionRegistry registry, AresClassPathBeanDefinitionScanner scanner)
     {
         Class<?> beanClass = resolveClass(beanDefinitionHolder);
         Annotation service = findProviderAnnotation(beanClass);
         AnnotationAttributes serviceAnnotationAttributes = AnnotationUtils.getAnnotationAttributes(service, false, false);
 
-        Arrays.stream(beanClass.getInterfaces()).forEach(interfaceClass -> {
-            Method[] methods = interfaceClass.getDeclaredMethods();
-            String interfaceName = interfaceClass.getName();
-            String group = serviceAnnotationAttributes.getString("group");
-            String version = serviceAnnotationAttributes.getString("version");
-            String center = serviceAnnotationAttributes.getString("center");
-            for (Method method : methods)
+        Class<?> interfaceClass = com.asiainfo.frame.remote.invoke.AnnotationUtils.resolveServiceInterfaceClass(serviceAnnotationAttributes, beanClass);
+        String annotatedServiceBeanName = beanDefinitionHolder.getBeanName();
+
+        String group = serviceAnnotationAttributes.getString("group");
+        String version = serviceAnnotationAttributes.getString("version");
+        String interfaceName = interfaceClass.getName();
+
+        String beanName = buildBeanName(interfaceName, group, version);
+
+        BeanDefinition beanDefinition = beanDefinitionHolder.getBeanDefinition();
+        if (scanner.checkCandidate(beanName, beanDefinition))
+        {
+            registry.registerBeanDefinition(beanName, beanDefinition);
+        }
+
+        Method[] methods = interfaceClass.getDeclaredMethods();
+
+
+        for (Method method : methods)
+        {
+            StringJoiner uniqueKey = new StringJoiner("#");
+            uniqueKey.add(interfaceName);
+            uniqueKey.add(method.getName());
+            uniqueKey.add(group);
+            uniqueKey.add(version);
+            String parameterTypes = Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
+            uniqueKey.add(parameterTypes);
+
+            String uniqueId = uniqueKey.toString();
+            MethodHandle methodHandle = getMethodHandle(beanClass, method, uniqueId);
+
+            if (null != methodHandle)
             {
-                StringJoiner uniqueKey = new StringJoiner("#");
-                uniqueKey.add(interfaceName);
-                uniqueKey.add(method.getName());
-                uniqueKey.add(group);
-                uniqueKey.add(version);
-                String parameterTypes = Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
-                uniqueKey.add(parameterTypes);
-
-                MethodHandle methodHandle = getMethodHandle(beanClass, method, uniqueKey);
-
-                if (null != methodHandle)
-                {
-                    addMethodHandle(uniqueKey.toString(), methodHandle);
-                }
+                addMethodHandle(uniqueId, methodHandle);
             }
-        });
-
-
+        }
     }
+
+    public static String buildBeanName(String interfaceName, String group, String version)
+    {
+        StringJoiner stringJoiner = new StringJoiner(":");
+        stringJoiner.add("AresBean");
+        stringJoiner.add(interfaceName);
+        stringJoiner.add(group);
+        stringJoiner.add(version);
+        return stringJoiner.toString();
+    }
+
 
     private Annotation findProviderAnnotation(Class<?> beanClass)
     {
