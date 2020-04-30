@@ -176,7 +176,7 @@ public class ProviderController
                 PROVIDER_SERVICE.put(beanName, bean);
             }
 
-
+            // 这里不支持这种调用
             return methodHandle.invoke(bean, params);
         } catch (ClassNotFoundException e)
         {
