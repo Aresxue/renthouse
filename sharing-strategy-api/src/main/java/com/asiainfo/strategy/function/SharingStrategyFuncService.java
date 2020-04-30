@@ -1,8 +1,8 @@
 package com.asiainfo.strategy.function;
 
 
-import com.asiainfo.frame.base.RequestBase;
-import com.asiainfo.frame.base.ResponseBase;
+import com.asiainfo.frame.vo.RequestBase;
+import com.asiainfo.frame.vo.ResponseBase;
 
 import java.util.List;
 import java.util.Map;

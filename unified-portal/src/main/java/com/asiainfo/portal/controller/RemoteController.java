@@ -1,8 +1,8 @@
 package com.asiainfo.portal.controller;
 
 import com.asiainfo.frame.annotations.AresConsumer;
-import com.asiainfo.frame.base.RequestBase;
-import com.asiainfo.frame.base.ResponseBase;
+import com.asiainfo.frame.vo.RequestBase;
+import com.asiainfo.frame.vo.ResponseBase;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

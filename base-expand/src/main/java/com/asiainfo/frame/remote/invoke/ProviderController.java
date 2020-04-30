@@ -1,9 +1,9 @@
 package com.asiainfo.frame.remote.invoke;
 
-import com.asiainfo.frame.base.ResponseBase;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
+import com.asiainfo.frame.vo.ResponseBase;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -34,14 +34,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_DATE_ERROR;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_JSON_PARSE;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_CLASS;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD;
-import static com.asiainfo.frame.base.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_METHOD;
-import static com.asiainfo.frame.base.ResponseEnum.UNKNOWN_THROWABLE;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_DATE_ERROR;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_JSON_PARSE;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_CLASS;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD;
+import static com.asiainfo.frame.vo.ResponseEnum.INVOKE_FAILURE_NOT_FOUND_METHOD;
+import static com.asiainfo.frame.vo.ResponseEnum.UNKNOWN_THROWABLE;
 
 /**
  * @author: Ares

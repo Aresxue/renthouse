@@ -1,4 +1,4 @@
-package com.asiainfo.frame.base;
+package com.asiainfo.frame.vo;
 
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 

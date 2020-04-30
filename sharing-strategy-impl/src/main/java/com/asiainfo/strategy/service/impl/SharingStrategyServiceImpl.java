@@ -1,11 +1,11 @@
-package com.asiainfo.strategy.function.impl;
+package com.asiainfo.strategy.service.impl;
 
 import com.asiainfo.frame.annotations.AresProvider;
-import com.asiainfo.frame.base.RequestBase;
-import com.asiainfo.frame.base.ResponseBase;
-import com.asiainfo.frame.base.ResponseEnum;
-import com.asiainfo.strategy.business.SharingStrategyBusService;
+import com.asiainfo.frame.vo.RequestBase;
+import com.asiainfo.frame.vo.ResponseBase;
+import com.asiainfo.frame.vo.ResponseEnum;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
+import com.asiainfo.strategy.module.SharingStrategyModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,12 @@ import java.util.Map;
  */
 @Service
 @AresProvider(center = "sharing-strategy-impl", group = "ares", version = "1.0.0")
-public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncService
+public class SharingStrategyServiceImpl implements SharingStrategyFuncService
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyFuncServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyServiceImpl.class);
 
     @Autowired
-    private SharingStrategyBusService sharingStrategyBusService;
+    private SharingStrategyModule sharingStrategyModule;
 
     /**
      * @author: Ares
