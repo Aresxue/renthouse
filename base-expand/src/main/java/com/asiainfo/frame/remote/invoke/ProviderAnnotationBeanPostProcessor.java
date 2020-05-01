@@ -78,7 +78,7 @@ public class ProviderAnnotationBeanPostProcessor implements BeanDefinitionRegist
             Set<BeanDefinitionHolder> beanDefinitionHolders = findServiceBeanDefinitionHolders(scanner, packageToScan, registry, beanNameGenerator);
             if (!CollectionUtils.isEmpty(beanDefinitionHolders))
             {
-                beanDefinitionHolders.forEach(beanDefinitionHolder -> registerProviderBean(beanDefinitionHolder,registry,scanner));
+                beanDefinitionHolders.forEach(beanDefinitionHolder -> registerProviderBean(beanDefinitionHolder, registry, scanner));
 
                 if (LOGGER.isInfoEnabled())
                 {
@@ -137,19 +137,19 @@ public class ProviderAnnotationBeanPostProcessor implements BeanDefinitionRegist
             addServiceBean(beanUnique, null);
         }
 
-//        Method[] methods = interfaceClass.getDeclaredMethods();
-//        for (Method method : methods)
-//        {
-//            StringJoiner uniqueKey = new StringJoiner("#");
-//            uniqueKey.add(interfaceName);
-//            uniqueKey.add(method.getName());
-//            uniqueKey.add(group);
-//            uniqueKey.add(version);
-//            String parameterTypes = Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
-//            uniqueKey.add(parameterTypes);
-//
-//            String uniqueId = uniqueKey.toString();
-//        }
+        //        Method[] methods = interfaceClass.getDeclaredMethods();
+        //        for (Method method : methods)
+        //        {
+        //            StringJoiner uniqueKey = new StringJoiner("#");
+        //            uniqueKey.add(interfaceName);
+        //            uniqueKey.add(method.getName());
+        //            uniqueKey.add(group);
+        //            uniqueKey.add(version);
+        //            String parameterTypes = Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
+        //            uniqueKey.add(parameterTypes);
+        //
+        //            String uniqueId = uniqueKey.toString();
+        //        }
     }
 
     public static String buildBeanName(String interfaceName, String group, String version)

@@ -23,13 +23,17 @@ public class ConsumerInvokeHandler implements InvocationHandler
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        try {
-            if(null == bean){
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+    {
+        try
+        {
+            if (null == bean)
+            {
                 bean = SpringUtil.getBean(consumerBeanName);
             }
             return method.invoke(bean, args);
-        } catch (InvocationTargetException var6) {
+        } catch (InvocationTargetException var6)
+        {
             throw var6.getTargetException();
         }
     }

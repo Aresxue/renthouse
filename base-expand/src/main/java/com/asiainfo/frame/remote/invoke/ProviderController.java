@@ -99,7 +99,7 @@ public class ProviderController
         String version = strings[3];
         String[] paramTypes = strings[4].split(",");
 
-        String beanUnique = generateBeanUnique(interfaceName,group,version);
+        String beanUnique = generateBeanUnique(interfaceName, group, version);
         List<Object> serviceBeans = SERVICE_BEANS.get(beanUnique);
         if (CollectionUtils.isEmpty(serviceBeans))
         {
@@ -166,7 +166,6 @@ public class ProviderController
      * @description: 生成实例唯一标识
      * @date: 2020/4/30 19:22
      * @param: [interfaceName, group, version]
-     *
      * @return: java.lang.String 响应参数
      */
     public static String generateBeanUnique(String interfaceName, String group, String version)

@@ -169,7 +169,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 
     @Override
     @Nullable
-    public Constructor<?>[] determineCandidateConstructors(@NonNull Class<?> beanClass,@NonNull String beanName) throws BeanCreationException
+    public Constructor<?>[] determineCandidateConstructors(@NonNull Class<?> beanClass, @NonNull String beanName) throws BeanCreationException
     {
         if (!lookupMethodsChecked.contains(beanName))
         {
@@ -341,7 +341,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     }
 
     @Override
-    public PropertyValues postProcessProperties(@NonNull PropertyValues pvs, @NonNull  Object bean,@NonNull String beanName)
+    public PropertyValues postProcessProperties(@NonNull PropertyValues pvs, @NonNull Object bean, @NonNull String beanName)
     {
         InjectionMetadata metadata = this.findAresConsumerMetadata(beanName, bean.getClass(), pvs);
 

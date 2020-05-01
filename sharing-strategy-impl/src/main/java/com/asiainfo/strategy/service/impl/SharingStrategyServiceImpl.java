@@ -86,6 +86,6 @@ public class SharingStrategyServiceImpl implements SharingStrategyService
         List list = new ArrayList();
         list.add(1);
         params[0] = Integer.valueOf(1);
-        methodHandle.invokeWithArguments(s, 1,2);
+        methodHandle.invokeWithArguments(s, 1, 2);
     }
 }

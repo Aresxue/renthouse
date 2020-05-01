@@ -40,7 +40,8 @@ public class ConsumerBeanFactory implements FactoryBean<Object>
     @Override
     public Object getObject()
     {
-        if(null == consumerInvoke){
+        if (null == consumerInvoke)
+        {
             consumerInvoke = SpringUtil.getBean(ConsumerInvoke.class);
         }
         return consumerInvoke.invoke(interfaceClass, interfaceName, center, group, version);

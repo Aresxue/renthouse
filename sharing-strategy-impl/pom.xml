@@ -38,6 +38,13 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
+        <!-- 用来提示properties或yaml文件的编写 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- http连接 -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
