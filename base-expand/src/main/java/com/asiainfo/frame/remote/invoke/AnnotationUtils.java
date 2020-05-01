@@ -26,10 +26,6 @@ import java.util.Map.Entry;
 
 public class AnnotationUtils
 {
-    public AnnotationUtils()
-    {
-    }
-
     public static String resolveInterfaceName(AnnotationAttributes attributes, Class<?> defaultInterfaceClass)
     {
         return resolveServiceInterfaceClass(attributes, defaultInterfaceClass).getName();
@@ -43,7 +39,7 @@ public class AnnotationUtils
     public static Class<?> resolveServiceInterfaceClass(AnnotationAttributes attributes, Class<?> defaultInterfaceClass) throws IllegalArgumentException
     {
         ClassLoader classLoader = defaultInterfaceClass != null ? defaultInterfaceClass.getClassLoader() : Thread.currentThread().getContextClassLoader();
-        Class<?> interfaceClass = (Class) getAttribute(attributes, "interfaceClass");
+        Class<?> interfaceClass = getAttribute(attributes, "interfaceClass");
         if (Void.TYPE.equals(interfaceClass))
         {
             interfaceClass = null;
@@ -63,7 +59,7 @@ public class AnnotationUtils
             }
         }
 
-        Assert.notNull(interfaceClass, "@Service interfaceClass() or interfaceName() or interface class must be present!");
+        Assert.notNull(interfaceClass, "@AresProvider interfaceClass() or interfaceName() or interface class must be present!");
         Assert.isTrue(interfaceClass.isInterface(), "The annotated type must be an interface!");
         return interfaceClass;
     }
@@ -85,32 +81,22 @@ public class AnnotationUtils
         }
         else
         {
-            Map<ElementType, List<A>> annotationsMap = new LinkedHashMap();
+            Map<ElementType, List<A>> annotationsMap = new LinkedHashMap<>();
             Target target = (Target) annotationClass.getAnnotation(Target.class);
             ElementType[] elementTypes = target.value();
-            ElementType[] var7 = elementTypes;
-            int var8 = elementTypes.length;
 
-            for (int var9 = 0; var9 < var8; ++var9)
+            for (ElementType elementType : elementTypes)
             {
-                ElementType elementType = var7[var9];
-                List<A> annotationsList = new LinkedList();
+                List<A> annotationsList = new LinkedList<>();
                 switch (elementType)
                 {
                     case PARAMETER:
                         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-                        Annotation[][] var21 = parameterAnnotations;
-                        int var22 = parameterAnnotations.length;
 
-                        for (int var23 = 0; var23 < var22; ++var23)
+                        for (Annotation[] annotations : parameterAnnotations)
                         {
-                            Annotation[] annotations = var21[var23];
-                            Annotation[] var17 = annotations;
-                            int var18 = annotations.length;
-
-                            for (int var19 = 0; var19 < var18; ++var19)
+                            for (Annotation annotation : annotations)
                             {
-                                Annotation annotation = var17[var19];
                                 if (annotationClass.equals(annotation.annotationType()))
                                 {
                                     annotationsList.add((A) annotation);
@@ -132,6 +118,9 @@ public class AnnotationUtils
                         {
                             annotationsList.add(annotation2);
                         }
+                        break;
+                    default:
+                        break;
                 }
 
                 if (!annotationsList.isEmpty())
@@ -153,22 +142,22 @@ public class AnnotationUtils
         }
         else
         {
-            Map<String, Object> resolvedAnnotationAttributes = new LinkedHashMap();
-            Iterator var4 = sourceAnnotationAttributes.entrySet().iterator();
+            Map<String, Object> resolvedAnnotationAttributes = new LinkedHashMap<>();
+            Iterator<Entry<String, Object>> attributesIterator = sourceAnnotationAttributes.entrySet().iterator();
 
             while(true)
             {
-                Entry entry;
+                Entry<String, Object> entry;
                 String attributeName;
                 do
                 {
-                    if (!var4.hasNext())
+                    if (!attributesIterator.hasNext())
                     {
                         return Collections.unmodifiableMap(resolvedAnnotationAttributes);
                     }
 
-                    entry = (Entry) var4.next();
-                    attributeName = (String) entry.getKey();
+                    entry = attributesIterator.next();
+                    attributeName = entry.getKey();
                 } while(ObjectUtils.containsElement(ignoreAttributeNames, attributeName));
 
                 Object attributeValue = entry.getValue();
@@ -202,8 +191,8 @@ public class AnnotationUtils
         else
         {
             Map<String, Object> attributes = org.springframework.core.annotation.AnnotationUtils.getAnnotationAttributes(annotation);
-            Map<String, Object> actualAttributes = new LinkedHashMap();
-            Iterator var6 = attributes.entrySet().iterator();
+            Map<String, Object> actualAttributes = new LinkedHashMap<>();
+            Iterator<Entry<String, Object>> attributeIterator = attributes.entrySet().iterator();
 
             while(true)
             {
@@ -215,12 +204,12 @@ public class AnnotationUtils
                     {
                         do
                         {
-                            if (!var6.hasNext())
+                            if (!attributeIterator.hasNext())
                             {
                                 return resolvePlaceholders(actualAttributes, propertyResolver, ignoreAttributeNames);
                             }
 
-                            Entry<String, Object> entry = (Entry) var6.next();
+                            Entry<String, Object> entry = attributeIterator.next();
                             attributeName = (String) entry.getKey();
                             attributeValue = entry.getValue();
                         } while(ignoreDefaultValue && ObjectUtils.nullSafeEquals(attributeValue, org.springframework.core.annotation.AnnotationUtils.getDefaultValue(annotation, attributeName)));

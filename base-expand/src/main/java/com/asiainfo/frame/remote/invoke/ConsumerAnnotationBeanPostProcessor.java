@@ -86,7 +86,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     private String requiredParameterName = "required";
     private boolean requiredParameterValue = true;
 
-    private Map<String, String> consumerParams = new HashMap<>();
+    private final Map<String, String> consumerParams = new HashMap<>();
 
     private Environment environment;
 
@@ -141,7 +141,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     }
 
     @Override
-    public void setBeanFactory(BeanFactory beanFactory)
+    public void setBeanFactory(@NonNull BeanFactory beanFactory)
     {
         if (!(beanFactory instanceof ConfigurableListableBeanFactory))
         {
@@ -154,30 +154,30 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     }
 
     @Override
-    public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName)
+    public void postProcessMergedBeanDefinition(@NonNull RootBeanDefinition beanDefinition, @NonNull Class<?> beanType, @NonNull String beanName)
     {
         InjectionMetadata metadata = this.findAresConsumerMetadata(beanName, beanType, (PropertyValues) null);
         metadata.checkConfigMembers(beanDefinition);
     }
 
     @Override
-    public void resetBeanDefinition(String beanName)
+    public void resetBeanDefinition(@NonNull String beanName)
     {
-        this.lookupMethodsChecked.remove(beanName);
-        this.injectionMetadataCache.remove(beanName);
+        lookupMethodsChecked.remove(beanName);
+        injectionMetadataCache.remove(beanName);
     }
 
     @Override
     @Nullable
-    public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeanCreationException
+    public Constructor<?>[] determineCandidateConstructors(@NonNull Class<?> beanClass,@NonNull String beanName) throws BeanCreationException
     {
-        if (!this.lookupMethodsChecked.contains(beanName))
+        if (!lookupMethodsChecked.contains(beanName))
         {
             if (org.springframework.core.annotation.AnnotationUtils.isCandidateClass(beanClass, Lookup.class))
             {
                 try
                 {
-                    Class targetClass = beanClass;
+                    Class<?> targetClass = beanClass;
 
                     do
                     {
@@ -185,13 +185,13 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                             Lookup lookup = (Lookup) method.getAnnotation(Lookup.class);
                             if (lookup != null)
                             {
-                                Assert.state(this.beanFactory != null, "No BeanFactory available");
+                                Assert.state(beanFactory != null, "No BeanFactory available");
                                 LookupOverride override = new LookupOverride(method, lookup.value());
 
                                 try
                                 {
-                                    RootBeanDefinition mbd = (RootBeanDefinition) this.beanFactory.getMergedBeanDefinition(beanName);
-                                    mbd.getMethodOverrides().addOverride(override);
+                                    RootBeanDefinition beanDefinition = (RootBeanDefinition) beanFactory.getMergedBeanDefinition(beanName);
+                                    beanDefinition.getMethodOverrides().addOverride(override);
                                 } catch (NoSuchBeanDefinitionException var6)
                                 {
                                     throw new BeanCreationException(beanName, "Cannot apply @Lookup to beans without corresponding bean definition");
@@ -201,24 +201,24 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                         });
                         targetClass = targetClass.getSuperclass();
                     } while(targetClass != null && targetClass != Object.class);
-                } catch (IllegalStateException var22)
+                } catch (IllegalStateException e)
                 {
-                    throw new BeanCreationException(beanName, "Lookup method resolution failed", var22);
+                    throw new BeanCreationException(beanName, "Lookup method resolution failed", e);
                 }
             }
 
-            this.lookupMethodsChecked.add(beanName);
+            lookupMethodsChecked.add(beanName);
         }
 
-        Constructor<?>[] candidateConstructors = (Constructor[]) this.candidateConstructorsCache.get(beanClass);
+        Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
         if (candidateConstructors == null)
         {
-            synchronized (this.candidateConstructorsCache)
+            synchronized (candidateConstructorsCache)
             {
-                candidateConstructors = (Constructor[]) this.candidateConstructorsCache.get(beanClass);
+                candidateConstructors = candidateConstructorsCache.get(beanClass);
                 if (candidateConstructors == null)
                 {
-                    Constructor[] rawCandidates;
+                    Constructor<?>[] rawCandidates;
                     try
                     {
                         rawCandidates = beanClass.getDeclaredConstructors();
@@ -232,13 +232,13 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                     Constructor<?> defaultConstructor = null;
                     Constructor<?> primaryConstructor = BeanUtils.findPrimaryConstructor(beanClass);
                     int nonSyntheticConstructors = 0;
-                    Constructor[] var11 = rawCandidates;
-                    int var12 = rawCandidates.length;
-                    int var13 = 0;
+                    Constructor<?>[] var11 = rawCandidates;
+                    int candidatesLength = rawCandidates.length;
+                    int count = 0;
 
                     while(true)
                     {
-                        if (var13 >= var12)
+                        if (count >= candidatesLength)
                         {
                             if (!candidates.isEmpty())
                             {
@@ -254,7 +254,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                                     }
                                 }
 
-                                candidateConstructors = (Constructor[]) candidates.toArray(new Constructor[0]);
+                                candidateConstructors = (Constructor<?>[]) candidates.toArray(new Constructor[0]);
                             }
                             else if (rawCandidates.length == 1 && rawCandidates[0].getParameterCount() > 0)
                             {
@@ -277,19 +277,19 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                             break;
                         }
 
-                        label144:
+                        constructor:
                         {
-                            Constructor<?> candidate = var11[var13];
+                            Constructor<?> candidate = var11[count];
                             if (!candidate.isSynthetic())
                             {
                                 ++nonSyntheticConstructors;
                             }
                             else if (primaryConstructor != null)
                             {
-                                break label144;
+                                break constructor;
                             }
 
-                            MergedAnnotation<?> ann = this.findAresConsumerAnnotation(candidate);
+                            MergedAnnotation<?> ann = findAresConsumerAnnotation(candidate);
                             if (ann == null)
                             {
                                 Class<?> userClass = ClassUtils.getUserClass(beanClass);
@@ -331,7 +331,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                             }
                         }
 
-                        ++var13;
+                        ++count;
                     }
                 }
             }
@@ -341,7 +341,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     }
 
     @Override
-    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
+    public PropertyValues postProcessProperties(@NonNull PropertyValues pvs, @NonNull  Object bean,@NonNull String beanName)
     {
         InjectionMetadata metadata = this.findAresConsumerMetadata(beanName, bean.getClass(), pvs);
 
@@ -349,12 +349,12 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
         {
             metadata.inject(bean, beanName, pvs);
             return pvs;
-        } catch (BeanCreationException var6)
+        } catch (BeanCreationException e)
         {
-            throw var6;
+            throw e;
         } catch (Throwable var7)
         {
-            throw new BeanCreationException(beanName, "Injection of autowired dependencies failed", var7);
+            throw new BeanCreationException(beanName, "Injection of aresConsumer dependencies failed", var7);
         }
     }
 
@@ -362,29 +362,29 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     public void processInjection(Object bean) throws BeanCreationException
     {
         Class<?> clazz = bean.getClass();
-        InjectionMetadata metadata = this.findAresConsumerMetadata(clazz.getName(), clazz, (PropertyValues) null);
+        InjectionMetadata metadata = findAresConsumerMetadata(clazz.getName(), clazz, (PropertyValues) null);
 
         try
         {
             metadata.inject(bean, (String) null, (PropertyValues) null);
-        } catch (BeanCreationException var5)
+        } catch (BeanCreationException e)
         {
-            throw var5;
-        } catch (Throwable var6)
+            throw e;
+        } catch (Throwable ex)
         {
-            throw new BeanCreationException("Injection of aresConsumer dependencies failed for class [" + clazz + "]", var6);
+            throw new BeanCreationException("Injection of aresConsumer dependencies failed for class [" + clazz + "]", ex);
         }
     }
 
     private InjectionMetadata findAresConsumerMetadata(String beanName, Class<?> clazz, @Nullable PropertyValues pvs)
     {
         String cacheKey = StringUtils.hasLength(beanName) ? beanName : clazz.getName();
-        InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
+        InjectionMetadata metadata = injectionMetadataCache.get(cacheKey);
         if (InjectionMetadata.needsRefresh(metadata, clazz))
         {
-            synchronized (this.injectionMetadataCache)
+            synchronized (injectionMetadataCache)
             {
-                metadata = (InjectionMetadata) this.injectionMetadataCache.get(cacheKey);
+                metadata = (InjectionMetadata) injectionMetadataCache.get(cacheKey);
                 if (InjectionMetadata.needsRefresh(metadata, clazz))
                 {
                     if (metadata != null)
@@ -392,8 +392,8 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                         metadata.clear(pvs);
                     }
 
-                    metadata = this.buildAresConsumerMetadata(clazz);
-                    this.injectionMetadataCache.put(cacheKey, metadata);
+                    metadata = buildAresConsumerMetadata(clazz);
+                    injectionMetadataCache.put(cacheKey, metadata);
                 }
             }
         }
@@ -410,7 +410,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
         else
         {
             List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
-            Class targetClass = clazz;
+            Class<?> targetClass = clazz;
 
             do
             {
@@ -478,17 +478,17 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     private MergedAnnotation<?> findAresConsumerAnnotation(AccessibleObject ao)
     {
         MergedAnnotations annotations = MergedAnnotations.from(ao);
-        Iterator var3 = this.aresConsumerAnnotationTypes.iterator();
+        Iterator<?> annotationTypeIterator = this.aresConsumerAnnotationTypes.iterator();
 
-        MergedAnnotation annotation;
+        MergedAnnotation<?> annotation;
         do
         {
-            if (!var3.hasNext())
+            if (!annotationTypeIterator.hasNext())
             {
                 return null;
             }
 
-            Class<? extends Annotation> type = (Class) var3.next();
+            Class<? extends Annotation> type = (Class<? extends Annotation>) annotationTypeIterator.next();
             annotation = annotations.get(type);
         } while(!annotation.isPresent());
 
@@ -498,7 +498,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     protected boolean determineRequiredStatus(MergedAnnotation<?> ann)
     {
         AnnotationAttributes annotationAttributes = ann.asMap((mergedAnnotation) -> new AnnotationAttributes(mergedAnnotation.getType()));
-        return !annotationAttributes.containsKey(this.requiredParameterName) || this.requiredParameterValue == annotationAttributes.getBoolean(this.requiredParameterName);
+        return !annotationAttributes.containsKey(requiredParameterName) || requiredParameterValue == annotationAttributes.getBoolean(requiredParameterName);
     }
 
     protected void determineConsumerParams(MergedAnnotation<?> ann)
@@ -516,7 +516,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
         }
         else
         {
-            return BeanFactoryUtils.beansOfTypeIncludingAncestors(this.beanFactory, type);
+            return BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory, type);
         }
     }
 
@@ -597,7 +597,7 @@ public class ConsumerAnnotationBeanPostProcessor extends InstantiationAwareBeanP
         }
 
         @Override
-        protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable
+        protected void inject(@NonNull Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable
         {
             if (!this.checkPropertySkipping(pvs))
             {
