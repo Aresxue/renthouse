@@ -8,7 +8,6 @@ import com.asiainfo.strategy.module.SharingStrategyModule;
 import com.asiainfo.strategy.service.SharingStrategyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandle;
@@ -30,7 +29,7 @@ public class SharingStrategyServiceImpl implements SharingStrategyService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyServiceImpl.class);
 
-    @Autowired
+//    @Autowired
     private SharingStrategyModule sharingStrategyModule;
 
     /**

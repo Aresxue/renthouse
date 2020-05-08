@@ -118,7 +118,7 @@ public class ProviderController
         if (null == serviceBean)
         {
             serviceBean = SpringUtil.getBean(beanUnique);
-            addServiceBean(beanUnique, serviceBean);
+            serviceBeans.set(0, serviceBean);
         }
 
         try
