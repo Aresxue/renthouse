@@ -1,6 +1,10 @@
 package com.asiainfo.strategy.module;
 
+import com.asiainfo.frame.vo.RequestBase;
+import com.asiainfo.frame.vo.ResponseBase;
+import com.asiainfo.frame.vo.ResponseEnum;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author: Ares
@@ -11,4 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SharingStrategyModule
 {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseBase sharingStrategy(RequestBase requestBase){
+        ResponseBase response = new ResponseBase();
+        response.setResponseEnum(ResponseEnum.SUCCESS);
+        return response;
+    }
 }

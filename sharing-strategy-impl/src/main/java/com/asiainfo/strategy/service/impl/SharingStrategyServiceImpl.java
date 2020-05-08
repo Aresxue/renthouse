@@ -43,10 +43,8 @@ public class SharingStrategyServiceImpl implements SharingStrategyService
     @Override
     public ResponseBase sharingStrategy(RequestBase request)
     {
-        LOGGER.info("调用功能服务");
-        ResponseBase response = new ResponseBase();
-        response.setResponseEnum(ResponseEnum.SUCCESS);
-        return response;
+        LOGGER.info("调用接口服务");
+        return  sharingStrategyModule.sharingStrategy(request);
     }
 
     @Override
