@@ -25,7 +25,9 @@ public interface SharingStrategyService
     ResponseBase sharingStrategy(RequestBase request);
 
     ResponseBase sharingStrategy(Map<String, List<RequestBase>> request);
+
     ResponseBase sharingStrategy(List<Map<String, String>> request);
+
     ResponseBase sharingStrategy(Integer i);
 
 }
