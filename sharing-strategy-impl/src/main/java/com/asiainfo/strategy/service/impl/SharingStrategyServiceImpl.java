@@ -1,9 +1,9 @@
 package com.asiainfo.strategy.service.impl;
 
 import com.asiainfo.frame.annotations.AresProvider;
+import com.asiainfo.frame.constants.ResponseEnum;
 import com.asiainfo.frame.vo.RequestBase;
 import com.asiainfo.frame.vo.ResponseBase;
-import com.asiainfo.frame.vo.ResponseEnum;
 import com.asiainfo.strategy.module.SharingStrategyModule;
 import com.asiainfo.strategy.service.SharingStrategyService;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class SharingStrategyServiceImpl implements SharingStrategyService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharingStrategyServiceImpl.class);
 
-//    @Autowired
+    //    @Autowired
     private SharingStrategyModule sharingStrategyModule;
 
     /**
@@ -43,7 +43,7 @@ public class SharingStrategyServiceImpl implements SharingStrategyService
     public ResponseBase sharingStrategy(RequestBase request)
     {
         LOGGER.info("调用接口服务");
-        return  sharingStrategyModule.sharingStrategy(request);
+        return sharingStrategyModule.sharingStrategy(request);
     }
 
     @Override

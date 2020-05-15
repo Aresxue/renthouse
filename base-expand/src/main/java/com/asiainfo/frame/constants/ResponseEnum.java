@@ -1,4 +1,4 @@
-package com.asiainfo.frame.vo;
+package com.asiainfo.frame.constants;
 
 /**
  * @author: Ares
@@ -6,7 +6,7 @@ package com.asiainfo.frame.vo;
  * @description: 响应信息
  * @version: JDK 1.8
  */
-public enum ResponseEnum implements ResponseEnumInfc
+public enum ResponseEnum
 {
     /**
      * 0开头调用成功
@@ -15,7 +15,7 @@ public enum ResponseEnum implements ResponseEnumInfc
     /**
      * 1开头远程调用失败
      */
-    INVOKE_FAILURE("1000", "远程调用失败", "远程调用失败: "), INVOKE_FAILURE_NOT_FOUND_METHOD("1001", "找不到对应的方法, 请检查调用服务是否配置AresProvider注解并检查启动日志", "找不到对应的方法: {}, 请检查调用服务是否配置AresProvider注解并检查启动日志"), INVOKE_FAILURE_MORE_THAN_ONE("1002", "发现多个同组别版本服务实现, 请指定不同版本或修改接口", "发现多个同组别版本服务实现: {}, 请指定不同版本或修改接口"), INVOKE_FAILURE_JSON_PARSE("1003", "解析Json参数失败", "解析Json参数: {}失败"), INVOKE_FAILURE_DATE_ERROR("1004", "参数为字符串而不是日期", "参数: {}为字符串而不是日期"), INVOKE_FAILURE_NOT_FOUND_CLASS("1005", "类不存在", "类: {}不存在"), INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD("1006", "方法不存在", "方法: {}不存在"), INVOKE_FAILURE_NOT_FOUND_SERVICE("1007", "服务不存在", "服务: {}不存在"),
+    INVOKE_FAILURE("1000", "远程调用失败", "远程调用失败: "), INVOKE_FAILURE_NOT_FOUND_METHOD("1001", "找不到对应的方法, 请检查调用服务是否配置AresProvider注解并检查启动日志", "找不到对应的方法: {}, 请检查调用服务是否配置AresProvider注解并检查启动日志"), INVOKE_FAILURE_MORE_THAN_ONE("1002", "发现多个同组别版本服务实现, 请指定不同版本或修改接口", "发现多个同组别版本服务实现: {}, 请指定不同版本或修改接口"), INVOKE_FAILURE_JSON_PARSE("1003", "解析Json参数失败", "解析Json参数: {}失败"), INVOKE_FAILURE_DATE_ERROR("1004", "参数为字符串而不是日期", "参数: {}为字符串而不是日期"), INVOKE_FAILURE_NOT_FOUND_CLASS("1005", "类不存在", "类: {}不存在"), INVOKE_FAILURE_NOT_FOUND_LOCAL_METHOD("1006", "方法不存在", "方法: {}不存在"), INVOKE_FAILURE_NOT_FOUND_SERVICE("1007", "服务不存在", "服务: {}不存在"), INVOKE_SPEED_OVER_QUICK("1008", "服务调用频率过快", "服务: {}调用频率过快"),
     /**
      * 9代表未知
      */
@@ -41,13 +41,11 @@ public enum ResponseEnum implements ResponseEnumInfc
         this.loggerDesc = loggerDesc;
     }
 
-    @Override
     public String getResponseCode()
     {
         return this.responseCode;
     }
 
-    @Override
     public String getResponseDesc()
     {
         return this.responseDesc;

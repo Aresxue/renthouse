@@ -1,5 +1,6 @@
 package com.asiainfo.frame.vo;
 
+import com.asiainfo.frame.constants.ResponseEnum;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 
 /**

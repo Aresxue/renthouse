@@ -251,7 +251,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 请求参数
      * @return: java.lang.String 响应内容
      **/
-    public static String post(String url, Map<String, Object> params) throws Exception
+    public static String post(String url, Map<String, Object> params) throws IOException
     {
         HttpPost httpPost = new HttpPost(url);
         configRequest(httpPost);
@@ -268,7 +268,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 请求参数, 自定义消息头, 超时时间
      * @return: java.lang.String 响应内容
      **/
-    public static String post(String url, Map<String, Object> params, Map<String, String> headers, int timeOut) throws Exception
+    public static String post(String url, Map<String, Object> params, Map<String, String> headers, int timeOut) throws IOException
     {
         HttpPost httpPost = new HttpPost(url);
         configRequest(httpPost, headers, timeOut);
@@ -284,7 +284,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 请求参数, 自定义消息头
      * @return: java.lang.String 响应参数
      */
-    public static String post(String url, Map<String, Object> params, Map<String, String> headers) throws Exception
+    public static String post(String url, Map<String, Object> params, Map<String, String> headers) throws IOException
     {
         return post(url, params, headers, config.getTimeOut());
     }
@@ -298,7 +298,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 请求参数, 超时时间
      * @return: java.lang.String 响应参数
      */
-    public static String post(String url, Map<String, Object> params, int timeout) throws Exception
+    public static String post(String url, Map<String, Object> params, int timeout) throws IOException
     {
         return post(url, params, Collections.emptyMap(), timeout);
     }
@@ -310,7 +310,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * @param: [url] 请求地址
      * @return: java.lang.String 响应内容
      **/
-    public static String get(String url) throws Exception
+    public static String get(String url) throws IOException
     {
         HttpGet httpGet = new HttpGet(url);
         configRequest(httpGet);
@@ -327,7 +327,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 自定义消息头, 超时时间
      * @return: java.lang.String 响应内容
      **/
-    public static String get(String url, Map<String, String> headers, int timeout) throws Exception
+    public static String get(String url, Map<String, String> headers, int timeout) throws IOException
     {
         HttpGet httpGet = new HttpGet(url);
         configRequest(httpGet, headers, timeout);
@@ -343,7 +343,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 自定义消息头
      * @return: java.lang.String 响应内容
      **/
-    public static String get(String url, Map<String, String> headers) throws Exception
+    public static String get(String url, Map<String, String> headers) throws IOException
     {
         HttpGet httpGet = new HttpGet(url);
         configRequest(httpGet, headers, config.getTimeOut());
@@ -359,7 +359,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求地址, 超时时间
      * @return: java.lang.String 响应内容
      **/
-    public static String get(String url, int timeout) throws Exception
+    public static String get(String url, int timeout) throws IOException
     {
         HttpGet httpGet = new HttpGet(url);
         configRequest(httpGet, Collections.emptyMap(), timeout);
@@ -374,7 +374,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
      * 请求基类, 请求地址, 请求参数, 是否为Post请求
      * @return: java.lang.String 响应参数
      **/
-    private static String request(HttpRequestBase requestBase, String url, Map<String, Object> requestParams, boolean isPost) throws Exception
+    private static String request(HttpRequestBase requestBase, String url, Map<String, Object> requestParams, boolean isPost) throws IOException
     {
         if (isPost)
         {
@@ -496,7 +496,7 @@ public class HttpClientUtil implements ApplicationListener<ContextRefreshedEvent
             manager.closeExpiredConnections();
             // 关闭空闲的连接
             manager.closeIdleConnections(config.getHttpIdleTimeOut(), TimeUnit.MILLISECONDS);
-            LOGGER.info("关闭异常或空闲{}ms以上的连接", config.getHttpIdleTimeOut());
+            LOGGER.debug("关闭异常或空闲{}ms以上的连接", config.getHttpIdleTimeOut());
         }
     }
 }

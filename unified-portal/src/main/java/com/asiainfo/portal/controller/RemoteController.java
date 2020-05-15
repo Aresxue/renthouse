@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote")
 public class RemoteController
 {
-//    @Autowired
+    //    @Autowired
     @AresConsumer(center = "sharing-strategy-impl", group = "ares", version = "1.0.0")
     private SharingStrategyService sharingStrategyService;
 
@@ -27,18 +27,18 @@ public class RemoteController
     {
         return sharingStrategyService.sharingStrategy(request);
 
-//        Map map = new HashMap();
-//        List<RequestBase> temp = new ArrayList<>();
-//        temp.add(request);
-//        map.put("happy", temp);
-//        return sharingStrategyService.sharingStrategy(map);
+        //        Map map = new HashMap();
+        //        List<RequestBase> temp = new ArrayList<>();
+        //        temp.add(request);
+        //        map.put("happy", temp);
+        //        return sharingStrategyService.sharingStrategy(map);
 
-//        Map tempMap = new HashMap<>();
-//        tempMap.put(request.getUserName(),request.getPassword());
-//        List list = new ArrayList();
-//        list.add(tempMap);
-//        return sharingStrategyService.sharingStrategy(list);
+        //        Map tempMap = new HashMap<>();
+        //        tempMap.put(request.getUserName(),request.getPassword());
+        //        List list = new ArrayList();
+        //        list.add(tempMap);
+        //        return sharingStrategyService.sharingStrategy(list);
 
-//        return sharingStrategyService.sharingStrategy(1);
+        //        return sharingStrategyService.sharingStrategy(1);
     }
 }
