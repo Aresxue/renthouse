@@ -18,3 +18,11 @@ eureka:
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${eureka.client.eureka-server-port}/eureka/
 
+server:
+  tomcat:
+    # 在任意时刻接收和处理的最大连接数
+    max-connections: 8192
+    # 请求处理线程的最大数量
+    max-threads: 200
+    # accept队列的长度
+    accept-count: 100
