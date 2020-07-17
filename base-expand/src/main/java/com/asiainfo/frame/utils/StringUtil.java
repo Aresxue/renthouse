@@ -11,7 +11,17 @@ public class StringUtil
 {
     public static boolean isNotEmpty(String s)
     {
-        return null != s && !s.isEmpty();
+        return !isEmpty(s);
+    }
+
+    public static boolean isNotBlank(String s)
+    {
+        return !isBlank(s);
+    }
+
+    public static boolean isBlank(String s)
+    {
+        return null == s || s.trim().isEmpty();
     }
 
     public static boolean isEmpty(String s)
@@ -28,9 +38,13 @@ public class StringUtil
      */
     public static String underlineToBigCamelCase(String source)
     {
-        String[] strs = source.split("_");
+        if (isEmpty(source))
+        {
+            return source;
+        }
+        String[] strings = source.split("_");
         StringBuffer stringBuffer = new StringBuffer();
-        for (String s : strs)
+        for (String s : strings)
         {
             stringBuffer.append(upperFirst(s.toLowerCase()));
         }
@@ -46,9 +60,13 @@ public class StringUtil
      */
     public static String strikeToBigCamelCase(String source)
     {
-        String[] strs = source.split("-");
+        if (isEmpty(source))
+        {
+            return source;
+        }
+        String[] strings = source.split("-");
         StringBuffer stringBuffer = new StringBuffer();
-        for (String s : strs)
+        for (String s : strings)
         {
             stringBuffer.append(upperFirst(s.toLowerCase()));
         }
@@ -88,6 +106,10 @@ public class StringUtil
      */
     public static String upperFirst(String source)
     {
+        if (isEmpty(source))
+        {
+            return source;
+        }
         char[] chars = source.toCharArray();
         chars[0] = 97 <= chars[0] && chars[0] <= 122 ? (char) (chars[0] - 32) : chars[0];
         return String.valueOf(chars);
@@ -102,6 +124,10 @@ public class StringUtil
      */
     public static String lowerFirst(String source)
     {
+        if (isEmpty(source))
+        {
+            return source;
+        }
         char[] chars = source.toCharArray();
         chars[0] = 65 <= chars[0] && chars[0] <= 90 ? (char) (chars[0] + 32) : chars[0];
         return String.valueOf(chars);
@@ -114,9 +140,9 @@ public class StringUtil
      * @param: [email] 请求参数
      * @return: boolean 响应参数
      */
-    public static boolean validateEmailFromat(String email)
+    public static boolean validateEmailFormat(String email)
     {
-        if (StringUtil.isEmpty(email))
+        if (isEmpty(email))
         {
             return false;
         }

@@ -49,7 +49,7 @@ public class ClassTypeUtil
      * @author: Ares
      * @description: 判断是否为基础类型
      * @date: 2019/5/8 17:48
-     * @Param: [className] Class名称
+     * @param: [className] Class名称
      * @return: boolean 响应参数
      **/
     public static boolean isPrimitive(String className)
@@ -62,7 +62,7 @@ public class ClassTypeUtil
      * @author: Ares
      * @description: 判断是否是基础类型包装类
      * @date: 2019/6/14 10:01
-     * @Param: [className] Class名称
+     * @param: [className] Class名称
      * @return: boolean 响应参数
      */
     public static boolean isBaseWrap(String className)
@@ -74,7 +74,7 @@ public class ClassTypeUtil
      * @author: Ares
      * @description: 判断是否是基础类型包装类
      * @date: 2019/6/14 10:01
-     * @Param: [clazz] Class
+     * @param: [clazz] Class
      * @return: boolean 响应参数
      */
     public static boolean isBaseWrap(Class clazz)
@@ -86,7 +86,7 @@ public class ClassTypeUtil
      * @author: Ares
      * @description: 判断是否是基础类型或基础类型包装类
      * @date: 2019/6/14 10:07
-     * @Param: [className] Class名称
+     * @param: [className] Class名称
      * @return: boolean 响应参数
      */
     public static boolean isBaseOrWrap(String className)
@@ -98,7 +98,7 @@ public class ClassTypeUtil
      * @author: Ares
      * @description: 判断是否是基础类型或基础类型包装类
      * @date: 2019/6/14 10:08
-     * @Param: [clazz] Class
+     * @param: [clazz] Class
      * @return: boolean 响应参数
      */
     public static boolean isBaseOrWrap(Class clazz)
@@ -110,7 +110,7 @@ public class ClassTypeUtil
      * @author: Ares
      * @description: 判断是否是基础类型或基础类型包装类
      * @date: 2019/6/14 10:09
-     * @Param: [object] 对象
+     * @param: [object] 对象
      * @return: boolean 响应参数
      */
     public static boolean isBaseOrWrap(Object object)

@@ -60,7 +60,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 获取公钥字符串
      * @date: 2019/6/13 20:43
-     * @Param: [keyMap] 请求参数
+     * @param: [keyMap] 请求参数
      * @return: java.lang.String 响应参数
      */
     public static String getPublicKeyStr(Map<String, Object> keyMap) throws Exception
@@ -75,7 +75,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 获得私钥字符串
      * @date: 2019/6/13 20:44
-     * @Param: [keyMap] 请求参数
+     * @param: [keyMap] 请求参数
      * @return: java.lang.String 响应参数
      */
     public static String getPrivateKeyStr(Map<String, Object> keyMap) throws Exception
@@ -90,7 +90,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 获取公钥
      * @date: 2019/6/13 20:44
-     * @Param: [key] 请求参数
+     * @param: [key] 请求参数
      * @return: java.security.PublicKey 响应参数
      */
     public static PublicKey getPublicKey(String key) throws Exception
@@ -107,7 +107,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 获取私钥
      * @date: 2019/6/13 20:44
-     * @Param: [key] 请求参数
+     * @param: [key] 请求参数
      * @return: java.security.PrivateKey 响应参数
      */
     public static PrivateKey getPrivateKey(String key) throws Exception
@@ -124,7 +124,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 解码返回byte
      * @date: 2019/6/13 20:44
-     * @Param: [key] 请求参数
+     * @param: [key] 请求参数
      * @return: byte[] 响应参数
      */
     public static byte[] decryptBASE64(String key) throws Exception
@@ -137,7 +137,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 编码返回字符串
      * @date: 2019/6/13 20:44
-     * @Param: [key] 请求参数
+     * @param: [key] 请求参数
      * @return: java.lang.String 响应参数
      */
     public static String encryptBASE64(byte[] key) throws Exception
@@ -149,7 +149,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 签名
      * @date: 2019/6/13 20:45
-     * @Param: [data, privateKeyStr] 请求参数
+     * @param: [data, privateKeyStr] 请求参数
      * @return: byte[] 响应参数
      */
     public static byte[] sign(byte[] data, String privateKeyStr) throws Exception
@@ -165,7 +165,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 验证
      * @date: 2019/6/13 20:45
-     * @Param: [data, sign, publicKeyStr] 请求参数
+     * @param: [data, sign, publicKeyStr] 请求参数
      * @return: boolean 响应参数
      */
     public static boolean verify(byte[] data, byte[] sign, String publicKeyStr) throws Exception
@@ -181,7 +181,7 @@ public class RSAUtils
      * @author: Ares
      * @description: RSA加密解密
      * @date: 2019/6/13 20:45
-     * @Param: [cipher, input] 请求参数
+     * @param: [cipher, input] 请求参数
      * @return: byte[] 响应参数
      */
     public static byte[] rasCrypt(Cipher cipher, byte[] input) throws BadPaddingException, IllegalBlockSizeException, IOException
@@ -215,7 +215,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 加密
      * @date: 2019/6/13 20:45
-     * @Param: [plainText, publicKeyStr] 请求参数
+     * @param: [plainText, publicKeyStr] 请求参数
      * @return: byte[] 响应参数
      */
     public static byte[] encrypt(byte[] plainText, String publicKeyStr) throws Exception
@@ -231,7 +231,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 解密
      * @date: 2019/6/13 20:45
-     * @Param: [encryptText, privateKeyStr] 请求参数
+     * @param: [encryptText, privateKeyStr] 请求参数
      * @return: byte[] 响应参数
      */
     public static byte[] decrypt(byte[] encryptText, String privateKeyStr) throws Exception
@@ -266,7 +266,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 生成公钥和私钥文件
      * @date: 2019/6/13 20:45
-     * @Param: [publicKeyPath, privateKeyPath]
+     * @param: [publicKeyPath, privateKeyPath]
      * 公钥文件路径,私钥文件路径
      * @return: void 响应参数
      */
@@ -302,7 +302,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 根据公钥文件加密
      * @date: 2019/6/13 20:46
-     * @Param: [input, publicKeyPath] 请求参数
+     * @param: [input, publicKeyPath] 请求参数
      * @return: byte[] 响应参数
      */
     public static byte[] encryptByPublicKeyFile(String input, String publicKeyPath)
@@ -336,7 +336,7 @@ public class RSAUtils
      * @author: Ares
      * @description: 利用秘钥文件解密
      * @date: 2019/6/13 20:46
-     * @Param: [encryptData, privateKeyPath] 请求参数
+     * @param: [encryptData, privateKeyPath] 请求参数
      * @return: java.lang.String 响应参数
      */
     public static String decryptByPrivateKeyFile(byte[] encryptData, String privateKeyPath)

@@ -25,7 +25,7 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
      * @author: Ares
      * @description: 合租攻略
      * @date: 2019/6/17 10:20
-     * @Param: [request] 请求参数
+     * @param: [request] 请求参数
      * @return: ResponseBase 响应参数
      */
     @Override

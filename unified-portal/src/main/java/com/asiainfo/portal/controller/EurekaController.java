@@ -31,7 +31,7 @@ public class EurekaController
      * @author: Ares
      * @description: 获取注册在Eureka中的服务名称
      * @date: 2019/6/11 14:45
-     * @Param: [] 请求参数
+     * @param: [] 请求参数
      * @return: java.util.List<java.lang.String> 响应参数
      */
     @GetMapping("/getEurekaServices")

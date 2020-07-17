@@ -70,7 +70,7 @@ public class CommonController
      * @author: Ares
      * @description: 添加代理方法
      * @date: 2019/6/13 10:59
-     * @Param: [uniqueKey, service] 请求参数
+     * @param: [uniqueKey, service] 请求参数
      * @return: void 响应参数
      */
     public static void addProxyMethod(String uniqueKey, RemoteProxyService proxyService)
@@ -82,7 +82,7 @@ public class CommonController
      * @author: Ares
      * @description: 添加统一调用服务
      * @date: 2019/6/17 15:47
-     * @Param: [service, uniqueKey] 请求参数
+     * @param: [service, uniqueKey] 请求参数
      * @return: void 响应参数
      */
     public static void addServiceId(String service, Method method)
@@ -94,7 +94,7 @@ public class CommonController
      * @author: Ares
      * @description: 统一调用地址
      * @date: 2019/6/10 20:21
-     * @Param: [request] 请求参数
+     * @param: [request] 请求参数
      * @return: java.lang.Object 响应参数
      */
     @RequestMapping(value = "/invoke")
@@ -120,7 +120,7 @@ public class CommonController
      * @author: Ares
      * @description: 内部实例互相调用
      * @date: 2019/6/10 20:22
-     * @Param: [request] 请求参数
+     * @param: [request] 请求参数
      * @return: java.lang.Object 响应参数
      **/
     @RequestMapping(value = "/innerInvoke")
@@ -177,7 +177,7 @@ public class CommonController
      * @author: Ares
      * @description: 参数处理
      * @date: 2019/6/15 16:59
-     * @Param: [requestType, value, flag]
+     * @param: [requestType, value, flag]
      * 请求Class,值,json操作标识
      * @return: java.lang.Object 响应参数
      */

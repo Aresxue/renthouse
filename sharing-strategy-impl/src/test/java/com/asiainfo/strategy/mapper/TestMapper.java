@@ -32,6 +32,6 @@ public interface TestMapper
      * @param: [value] 请求参数
      * @return: int 响应参数
      */
-    int testInsertPayment(@Param("value") int value);
+    int testInsertPayment(@param("value") int value);
 
 }
