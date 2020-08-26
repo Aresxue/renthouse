@@ -23,7 +23,7 @@ public class IOHandleUtil
      * @param: [closeable] 请求参数
      * @return: void 响应参数
      */
-    public static void closeIOSteam(AutoCloseable closeable)
+    public static void closeIO(AutoCloseable closeable)
     {
         if (null != closeable)
         {

@@ -294,7 +294,7 @@ public class RSAUtils
             e.printStackTrace();
         } finally
         {
-            IOHandleUtil.closeIOSteam(writer);
+            IOHandleUtil.closeIO(writer);
         }
     }
 
@@ -327,7 +327,7 @@ public class RSAUtils
             e.printStackTrace();
         } finally
         {
-            IOHandleUtil.closeIOSteam(reader);
+            IOHandleUtil.closeIO(reader);
         }
         return cipherText;
     }
@@ -363,7 +363,7 @@ public class RSAUtils
             LOGGER.error("解密出错: ", e);
         } finally
         {
-            IOHandleUtil.closeIOSteam(reader);
+            IOHandleUtil.closeIO(reader);
         }
         return decryptData;
     }

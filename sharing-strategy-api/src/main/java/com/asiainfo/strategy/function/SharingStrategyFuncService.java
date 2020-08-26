@@ -2,8 +2,8 @@ package com.asiainfo.strategy.function;
 
 
 import com.asiainfo.frame.annotations.RemoteInfc;
-import com.asiainfo.frame.base.RequestBase;
-import com.asiainfo.frame.base.ResponseBase;
+import com.asiainfo.frame.base.BaseRequest;
+import com.asiainfo.frame.base.BaseResponse;
 
 /**
  * @author: Ares
@@ -21,5 +21,5 @@ public interface SharingStrategyFuncService
      * @Param: [request] 请求参数
      * @return: ResponseBase 响应参数
      */
-    ResponseBase sharingStrategy(RequestBase request);
+    BaseResponse sharingStrategy(BaseRequest request);
 }

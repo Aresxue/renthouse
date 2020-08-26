@@ -1,9 +1,9 @@
 package com.asiainfo.strategy.function.impl;
 
 import com.asiainfo.frame.annotations.RemoteService;
-import com.asiainfo.frame.base.RequestBase;
-import com.asiainfo.frame.base.ResponseBase;
-import com.asiainfo.frame.base.ResponseEnum;
+import com.asiainfo.frame.base.BaseRequest;
+import com.asiainfo.frame.base.BaseResponse;
+import com.asiainfo.frame.base.ResponseInfo;
 import com.asiainfo.strategy.business.SharingStrategyBusService;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
 import org.slf4j.Logger;
@@ -34,11 +34,11 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
      * @return: ResponseBase 响应参数
      */
     @Override
-    public ResponseBase sharingStrategy(RequestBase request)
+    public BaseResponse sharingStrategy(BaseRequest request)
     {
         logger.info("调用功能服务");
-        ResponseBase response = new ResponseBase();
-        response.setResponseEnum(ResponseEnum.SUCCESS);
+        BaseResponse response = new BaseResponse();
+        response.setResponseInfo(ResponseInfo.SUCCESS);
         return response;
     }
 }

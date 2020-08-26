@@ -24,11 +24,11 @@ public enum ResponseEnum implements ResponseEnumInfc
     /**
      * 响应码
      */
-    private String responseCode;
+    private final String responseCode;
     /**
      * 响应描述
      */
-    private String responseDesc;
+    private final String responseDesc;
 
     ResponseEnum(String responseCode, String responseDesc)
     {

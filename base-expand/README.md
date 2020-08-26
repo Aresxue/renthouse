@@ -33,7 +33,7 @@ sharingStrategyFuncService.sharingStrategy(request);
     "serviceCenter": "sharing-strategy-impl",
     "serviceVersion": "1.0.0",
     "methodName": "sharingStrategy",
-    "requestType": "com.asiainfo.frame.base.RequestBase"
+    "requestType": "com.asiainfo.frame.base.BaseRequest"
   },
   
   {

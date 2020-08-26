@@ -1,8 +1,9 @@
 package com.asiainfo.frame.remote.invoke;
 
 
-import com.asiainfo.frame.base.ResponseBase;
+import com.asiainfo.frame.base.BaseResponse;
 import com.asiainfo.frame.base.ResponseEnum;
+import com.asiainfo.frame.base.ResponseInfo;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
 import com.asiainfo.frame.utils.ClassTypeUtil;
 import com.asiainfo.frame.utils.DateUtil;
@@ -111,8 +112,8 @@ public class CommonController
         } catch (Exception e)
         {
             LOGGER.error("{}: ", ResponseEnum.UNKNOWN_ERROR.getResponseDesc(), e);
-            ResponseBase response = new ResponseBase();
-            response.setResponseEnum(ResponseEnum.UNKNOWN_ERROR);
+            BaseResponse response = new BaseResponse();
+            response.setResponseInfo(ResponseInfo.UNKNOWN_ERROR);
             return response;
         }
     }
@@ -127,25 +128,25 @@ public class CommonController
     @RequestMapping(value = "/innerInvoke")
     public Object innerInvoke(@RequestParam(required = false) MultiValueMap<String, Object> parameters)
     {
-        ResponseBase response = new ResponseBase();
+        BaseResponse response = new BaseResponse();
         List<RemoteProxyService> proxyServices = REMOTE_PROXY_SERVICE.get(Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString());
         if (null == proxyServices)
         {
             LOGGER.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
+//            response.setResponseInfo(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
         if (proxyServices.size() > 1)
         {
             LOGGER.error(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE.getResponseDesc());
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE);
+//            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_MORE_THAN_ONE);
             return response;
         }
         RemoteProxyService service = proxyServices.get(0);
         if (null == service || null == service.getProxyService() || null == service.getProxyMethod())
         {
             LOGGER.error(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE.getResponseDesc());
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
+//            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE_NOT_FOUND_SERVICE);
             return response;
         }
         Method method = service.getProxyMethod();
@@ -168,7 +169,7 @@ public class CommonController
         } catch (Exception e)
         {
             LOGGER.error("{}: ", ResponseEnum.INVOKE_FAILURE.getResponseDesc(), e);
-            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE);
+//            response.setResponseEnum(ResponseEnum.INVOKE_FAILURE);
         }
         return response;
     }
