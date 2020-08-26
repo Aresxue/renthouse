@@ -1,13 +1,17 @@
 package com.asiainfo.frame.base;
 
+import java.io.Serializable;
+
 /**
  * @author: Ares
  * @date: 2019/6/11 17:39
  * @description: 响应基类
  * @version: JDK 1.8
  */
-public class BaseResponse<T>
+public class BaseResponse<T> implements Serializable
 {
+    private static final long serialVersionUID = -6202397032693082979L;
+
     /**
      * 响应码
      */
@@ -41,6 +45,11 @@ public class BaseResponse<T>
         this.responseDesc = responseDesc;
     }
 
+    public void setResponseDesc(String responseDesc, Object ... params)
+    {
+        this.responseDesc = String.format(responseDesc, params);
+    }
+
     public T getData()
     {
         return data;
@@ -66,6 +75,12 @@ public class BaseResponse<T>
     {
         this.responseCode = responseInfo.getResponseCode();
         this.responseDesc = responseInfo.getResponseDesc();
+    }
+
+    public void setResponseInfo(ResponseInfo responseInfo, Object ... params)
+    {
+        this.responseCode = responseInfo.getResponseCode();
+        this.responseDesc = String.format(responseInfo.getResponseDesc(), params);
     }
     
     @Override

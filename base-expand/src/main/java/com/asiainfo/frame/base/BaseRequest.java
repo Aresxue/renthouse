@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class BaseRequest implements Serializable
 {
+    private static final long serialVersionUID = 8776458218925079527L;
+
     /**
      * 用户标识
      */
