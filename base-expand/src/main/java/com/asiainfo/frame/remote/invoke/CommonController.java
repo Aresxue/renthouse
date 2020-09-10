@@ -1,7 +1,7 @@
 package com.asiainfo.frame.remote.invoke;
 
 
-import com.asiainfo.frame.base.BaseResponse;
+import com.asiainfo.frame.base.CommonResponse;
 import com.asiainfo.frame.base.ResponseEnum;
 import com.asiainfo.frame.base.ResponseInfo;
 import com.asiainfo.frame.exceptions.RemoteInvokeException;
@@ -112,7 +112,7 @@ public class CommonController
         } catch (Exception e)
         {
             LOGGER.error("{}: ", ResponseEnum.UNKNOWN_ERROR.getResponseDesc(), e);
-            BaseResponse response = new BaseResponse();
+            CommonResponse response = new CommonResponse();
             response.setResponseInfo(ResponseInfo.UNKNOWN_ERROR);
             return response;
         }
@@ -128,7 +128,7 @@ public class CommonController
     @RequestMapping(value = "/innerInvoke")
     public Object innerInvoke(@RequestParam(required = false) MultiValueMap<String, Object> parameters)
     {
-        BaseResponse response = new BaseResponse();
+        CommonResponse response = new CommonResponse();
         List<RemoteProxyService> proxyServices = REMOTE_PROXY_SERVICE.get(Objects.requireNonNull(parameters.getFirst("uniqueKey")).toString());
         if (null == proxyServices)
         {

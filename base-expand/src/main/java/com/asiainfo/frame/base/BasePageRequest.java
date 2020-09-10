@@ -8,31 +8,33 @@ package com.asiainfo.frame.base;
  */
 public class BasePageRequest extends BaseRequest
 {
+    private static final long serialVersionUID = 7504999184499520486L;
+
     /**
      * 页号, 从0开始
      */
-    private String pageNum;
+    private Long pageNum;
     /**
      * 单页数据量
      */
-    private String pageSize;
+    private Long pageSize;
 
-    public String getPageNum()
+    public Long getPageNum()
     {
         return pageNum;
     }
 
-    public void setPageNum(String pageNum)
+    public void setPageNum(Long pageNum)
     {
         this.pageNum = pageNum;
     }
 
-    public String getPageSize()
+    public Long getPageSize()
     {
         return pageSize;
     }
 
-    public void setPageSize(String pageSize)
+    public void setPageSize(Long pageSize)
     {
         this.pageSize = pageSize;
     }

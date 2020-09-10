@@ -2,7 +2,7 @@ package com.asiainfo.strategy.function.impl;
 
 import com.asiainfo.frame.annotations.RemoteService;
 import com.asiainfo.frame.base.BaseRequest;
-import com.asiainfo.frame.base.BaseResponse;
+import com.asiainfo.frame.base.CommonResponse;
 import com.asiainfo.frame.base.ResponseInfo;
 import com.asiainfo.strategy.business.SharingStrategyBusService;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
@@ -34,10 +34,10 @@ public class SharingStrategyFuncServiceImpl implements SharingStrategyFuncServic
      * @return: ResponseBase 响应参数
      */
     @Override
-    public BaseResponse sharingStrategy(BaseRequest request)
+    public CommonResponse sharingStrategy(BaseRequest request)
     {
         logger.info("调用功能服务");
-        BaseResponse response = new BaseResponse();
+        CommonResponse response = new CommonResponse();
         response.setResponseInfo(ResponseInfo.SUCCESS);
         return response;
     }

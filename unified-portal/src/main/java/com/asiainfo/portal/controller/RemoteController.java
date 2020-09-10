@@ -1,7 +1,7 @@
 package com.asiainfo.portal.controller;
 
 import com.asiainfo.frame.base.BaseRequest;
-import com.asiainfo.frame.base.BaseResponse;
+import com.asiainfo.frame.base.CommonResponse;
 import com.asiainfo.strategy.function.SharingStrategyFuncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ public class RemoteController
 
 
     @RequestMapping("/test")
-    public BaseResponse test(BaseRequest request)
+    public CommonResponse test(BaseRequest request)
     {
         return sharingStrategyFuncService.sharingStrategy(request);
     }

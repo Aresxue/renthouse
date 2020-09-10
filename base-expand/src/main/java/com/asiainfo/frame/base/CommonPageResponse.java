@@ -6,37 +6,37 @@ package com.asiainfo.frame.base;
  * @description: 分页响应容器
  * @version: JDK 1.8
  */
-public class BasePageResponse<T>
+public class CommonPageResponse<T>
 {
     /**
      * 总记录数
      */
-    private String recordCount;
+    private Long recordCount;
     /**
      * 总页数
      */
-    private String pageCount;
+    private Long pageCount;
     /**
      * 业务响应数据
      */
     private T businessData;
 
-    public String getRecordCount()
+    public Long getRecordCount()
     {
         return recordCount;
     }
 
-    public void setRecordCount(String recordCount)
+    public void setRecordCount(Long recordCount)
     {
         this.recordCount = recordCount;
     }
 
-    public String getPageCount()
+    public Long getPageCount()
     {
         return pageCount;
     }
 
-    public void setPageCount(String pageCount)
+    public void setPageCount(Long pageCount)
     {
         this.pageCount = pageCount;
     }

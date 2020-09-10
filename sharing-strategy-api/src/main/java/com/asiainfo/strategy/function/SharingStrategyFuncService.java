@@ -3,7 +3,7 @@ package com.asiainfo.strategy.function;
 
 import com.asiainfo.frame.annotations.RemoteInfc;
 import com.asiainfo.frame.base.BaseRequest;
-import com.asiainfo.frame.base.BaseResponse;
+import com.asiainfo.frame.base.CommonResponse;
 
 /**
  * @author: Ares
@@ -21,5 +21,5 @@ public interface SharingStrategyFuncService
      * @Param: [request] 请求参数
      * @return: ResponseBase 响应参数
      */
-    BaseResponse sharingStrategy(BaseRequest request);
+    CommonResponse sharingStrategy(BaseRequest request);
 }
