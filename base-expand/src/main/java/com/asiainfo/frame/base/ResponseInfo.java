@@ -17,7 +17,7 @@ public enum ResponseInfo
      */
     UNKNOWN_THROWABLE("900000", "未知状况", "未知状况: "),
     UNKNOWN_EXCEPTION("900001", "未知异常", "未知异常: "),
-    UNKNOWN_ERROR("900002", "未知错误", "未知未知错误异常: ");
+    UNKNOWN_ERROR("900002", "未知错误", "未知错误: ");
 
     /**
      * 响应码
