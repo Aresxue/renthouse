@@ -1,12 +1,10 @@
 package com.asiainfo;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.asiainfo.authorization.AuthorizationImplApplication;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = AuthorizationImplApplication.class)
 public class AuthorizationImplApplicationTests
 {
 
